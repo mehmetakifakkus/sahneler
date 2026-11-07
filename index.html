@@ -75,7 +75,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .zoom button + button { border-top: 1px solid var(--line); }
 .zoom button svg { display: block; margin: auto; }
 .zoom button[aria-expanded="true"] { color: var(--accent); }
-.shotwin { position: fixed; right: 16px; top: 128px; width: 280px; z-index: 7; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+.shotwin { position: fixed; right: 16px; top: 140px; width: 280px; z-index: 7; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
   padding: 12px 14px 12px; display: flex; flex-direction: column; gap: 12px; color: var(--text); box-shadow: 0 10px 28px rgba(0,0,0,.35);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 12.5px; }
 .shotwin[hidden] { display: none; }
@@ -104,7 +104,13 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .games { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .games button { font: 600 12.5px var(--font-body); color: #1b1f24; background: var(--accent); border: 0; border-radius: 7px; padding: 8px 6px; cursor: pointer; }
 .games button[aria-pressed="true"] { background: var(--text); }
-.game { position: fixed; right: 16px; top: 100px; width: min(340px, calc(100vw - 32px)); background: var(--panel);
+.games .daily { grid-column: 1 / -1; background: transparent; color: var(--accent); border: 1px solid var(--accent); display: flex; justify-content: center; gap: 8px; align-items: baseline; }
+.games .daily small { font: 500 11px var(--font-mono); opacity: .85; }
+.games .daily[aria-pressed="true"] { background: var(--accent); color: #1b1f24; }
+.game .sqs { font-size: 22px; letter-spacing: 4px; }
+.game .copybox { width: 100%; box-sizing: border-box; font: 500 12px var(--font-mono); color: var(--text); background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 7px; padding: 8px; }
+.game.info .links { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
+.game { position: fixed; right: 16px; top: 140px; width: min(340px, calc(100vw - 32px)); background: var(--panel);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 10px;
   padding: 14px; display: grid; gap: 10px; box-sizing: border-box; z-index: 5; }
 .game[hidden] { display: none; }
@@ -172,7 +178,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .game.info dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
 .game.info a { color: var(--accent); }
 .game.info .est { color: var(--muted); font-size: 11px; }
-.game.info { max-height: calc(100vh - 80px); overflow-y: auto; }
+.game.info { max-height: calc(100vh - 160px); overflow-y: auto; }
 .game.info .acts { align-items: center; justify-content: space-between; }
 .game.info .acts a { font-size: 12px; }
 .game.info .chip-c { margin: 0; font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 6px; }
@@ -211,6 +217,9 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
   .panel .note, .panel .sub { display: none; }
   .zoom { top: 10px; right: 10px; }
   .shotwin { top: 116px; right: 10px; width: min(280px, calc(100vw - 20px)); }
+  .gaming .panel { display: none; }
+  .gaming .game { top: auto; bottom: 10px; }
+  .gaming .game canvas { max-height: 24vh; width: auto; max-width: 100%; justify-self: center; }
 }
 </style>
 </head>
@@ -257,6 +266,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
   <div class="games" role="group" aria-label="Oyunlar">
     <button id="g-where" aria-pressed="false">Burası neresi?</button>
     <button id="g-explore" aria-pressed="false">Keşif</button>
+    <button id="g-daily" class="daily" aria-pressed="false">Günün bulmacası</button>
   </div>
   <p class="note"><strong>Stil geçişi henüz yok.</strong> Gördüğün, piksel art modelinin girdisi olacak geometri geçişi: binalar, gölgeler, yükseklik ve materyal maskeleri.</p>
   <div class="stats">
@@ -296,8 +306,10 @@ let CITIES = null;
 let GAME_MODE = null;      // survives view switches (explore mode)
 let current = null;
 const DIRS = { 0: "Kuzeye", 45: "Kuzeydoğuya", 90: "Doğuya", 135: "Güneydoğuya", 180: "Güneye", 225: "Güneybatıya", 270: "Batıya", 315: "Kuzeybatıya" };
+const hashParams = () => new URLSearchParams(location.hash.slice(1).split("&").slice(1).join("&"));
+let START_PARAMS = hashParams();          // &yer=<id or name>, &gunluk — read once, before the first setHash strips them
 function parseHash() {
-  const [c, h] = location.hash.slice(1).split("-");
+  const [c, h] = location.hash.slice(1).split("&")[0].split("-");
   const city = CITIES && c in CITIES ? c : (CITIES && "odtu" in CITIES ? "odtu" : Object.keys(CITIES)[0]);
   const views = CITIES[city].views;
   let vi = views.findIndex((v) => String(v.h) === h);
@@ -337,6 +349,8 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("hashchange", () => {
   if (!CITIES) return;
   const [c, vi] = parseHash();
+  START_PARAMS = hashParams();
+  if (c === current?.city && current.params) current.params();
   if (c !== current?.city || vi !== current?.vi) switchTo(c, vi, c === current?.city ? current.worldView() : null);
 });
 
@@ -610,8 +624,9 @@ const zMin = () => fitZ() * 0.9, zMax = () => 6 * dpr;
 function clampCam() {
   cam.z = Math.min(Math.max(cam.z, zMin()), zMax());
   const hw = W / 2 / cam.z, hh = H / 2 / cam.z;
-  cam.x = S.W > 2 * hw ? Math.min(Math.max(cam.x, hw), S.W - hw) : S.W / 2;
-  cam.y = S.H > 2 * hh ? Math.min(Math.max(cam.y, hh), S.H - hh) : S.H / 2;
+  // map larger than the view: keep it filling the screen; smaller: let it move but stay fully on screen
+  cam.x = S.W > 2 * hw ? Math.min(Math.max(cam.x, hw), S.W - hw) : Math.min(Math.max(cam.x, S.W - hw), hw);
+  cam.y = S.H > 2 * hh ? Math.min(Math.max(cam.y, hh), S.H - hh) : Math.min(Math.max(cam.y, S.H - hh), hh);
 }
 clampCam();
 function zoomAt(f, sx, sy) {      // sx, sy in device px
@@ -893,9 +908,12 @@ function lockNav(on) {
 function setGameButtons() {
   $("g-where").setAttribute("aria-pressed", String(GM.mode === "where"));
   $("g-explore").setAttribute("aria-pressed", String(GM.mode === "explore"));
+  $("g-where").setAttribute("aria-pressed", String(GM.mode === "where" && !GM.daily));
+  document.body.classList.toggle("gaming", !!GM.mode);
+  dailyButton();
 }
 function stopGames(byUser) {
-  GM.mode = null; labelFilter = null; gameEl.hidden = true; gameEl.innerHTML = ""; cross.hidden = true; clearPins();
+  GM.mode = null; GM.daily = null; labelFilter = null; gameEl.hidden = true; gameEl.innerHTML = ""; cross.hidden = true; clearPins();
   lockNav(false); setGameButtons();
   if (byUser) GAME_MODE = null;
 }
@@ -925,7 +943,7 @@ async function drawSnippet(cv, x, y) {
     }
 }
 function whereStart() {
-  closeInfo(); stopGames(); GM.mode = "where"; GAME_MODE = null; setGameButtons(); lockNav(true); labelFilter = "none";
+  closeInfo(); stopGames(); GM.mode = "where"; GM.pts = []; GAME_MODE = null; setGameButtons(); lockNav(true); labelFilter = "none";
   const inside = POIS.filter((p) => p.x > 300 && p.y > 220 && p.x < S.W - 300 && p.y < S.H - 220);
   const pool = inside.sort(() => Math.random() - 0.5).slice(0, 5).map((p) => ({ x: p.x, y: p.y, name: p.t }));
   while (pool.length < 5 && roads.length) {          // pad with random streets
@@ -940,18 +958,24 @@ function whereStart() {
 function whereRound() {
   const t = GM.targets[GM.round]; GM.phase = "guess"; GM.guess = null; clearPins();
   flyTo(S.W / 2, S.H / 2, fitZ());
-  card(`<h2>Burası neresi? <small>Tur ${GM.round + 1}/${GM.targets.length} · ${GM.total} puan</small></h2>
+  card(`<h2>${GM.daily ? `Günün bulmacası #${dayNo(GM.daily)}` : "Burası neresi?"} <small>Tur ${GM.round + 1}/${GM.targets.length} · ${GM.total} puan</small></h2>
     <canvas id="g-snip" aria-label="Haritadan bir kesit"></canvas>
     <p>Bu kesit haritanın neresinden? Haritada o noktaya <b>dokun</b>, sonra <b>Tahmin et</b>.</p>
     <div class="acts"><button id="g-quit">Oyunu bitir</button><button class="primary" id="g-go" disabled>Tahmin et</button></div>`);
   drawSnippet($("g-snip"), t.x, t.y);
+  if (innerWidth <= 560) requestAnimationFrame(() => {     // phone: fit the map into the strip above the card
+    const top = gameEl.getBoundingClientRect().top - 8; if (top < 120) return;
+    const z = Math.min(W / (S.W * 1.04), top * dpr / (S.H * 1.04));
+    flyTo(S.W / 2, S.H / 2 + (innerHeight / 2 - top / 2) * dpr / z, z);
+  });
   $("g-quit").onclick = () => stopGames(true);
   $("g-go").onclick = whereReveal;
+  if (GM.daily) $("g-quit").textContent = "Vazgeç (bugünkü hakkın kalır)";
 }
 function whereReveal() {
   const t = GM.targets[GM.round], [gx, gy] = GM.guess;
   const d = groundDist(gx, gy, t.x, t.y), pts = Math.round(1000 * Math.exp(-d / (DIAG / 10)));
-  GM.total += pts; GM.phase = "reveal"; pin("target", t.x, t.y);
+  GM.total += pts; GM.phase = "reveal"; pin("target", t.x, t.y); (GM.pts || (GM.pts = [])).push(pts);
   let name = t.name;
   if (!name) {                                       // nearest named street as a hint
     let best = null, bd = 1e9;
@@ -967,7 +991,7 @@ function whereReveal() {
     <p>Tahminin hedefe <b>${fmtM(d)}</b> uzaktı. Toplam: <b>${GM.total}</b> puan.</p>
     <div class="acts"><button id="g-quit">Oyunu bitir</button><button class="primary" id="g-next">${last ? "Sonucu gör" : "Sonraki tur"}</button></div>`);
   $("g-quit").onclick = () => stopGames(true);
-  $("g-next").onclick = () => { if (last) whereEnd(); else { GM.round++; whereRound(); } };
+  $("g-next").onclick = () => { if (last) (GM.daily ? dailyEnd() : whereEnd()); else { GM.round++; whereRound(); } };
 }
 function whereEnd() {
   const key = `izo-best-${city}`, best = Math.max(store.get(key, 0), GM.total); store.set(key, best);
@@ -981,6 +1005,88 @@ function whereEnd() {
     <div class="acts"><button id="g-quit">Kapat</button><button class="primary" id="g-again">Tekrar oyna</button></div>`);
   $("g-quit").onclick = () => stopGames(true);
   $("g-again").onclick = whereStart;
+}
+
+// ---- "Günün bulmacası": the same 5 rounds for everyone on a given day, shareable result
+const DAY0 = Date.UTC(2026, 10, 7);
+function today() { const d = new Date(), p = (n) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; }
+function dayNo(ds) { const [y, m, d] = ds.split("-").map(Number); return Math.floor((Date.UTC(y, m - 1, d) - DAY0) / 864e5) + 1; }
+function seeded(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+  let a = h >>> 0;
+  return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+const dailyState = () => store.get(`izo-daily-${city}`, null);
+const streakState = () => store.get(`izo-streak-${city}`, { last: null, n: 0 });
+function dailyButton() {
+  const b = $("g-daily"); if (!b) return;
+  const st = dailyState(), done = st && st.date === today();
+  b.innerHTML = done ? `Günün bulmacası <small>✓ ${st.total.toLocaleString("tr")} puan</small>` : `Günün bulmacası <small>#${dayNo(today())}</small>`;
+  b.setAttribute("aria-pressed", String(GM.mode === "where" && !!GM.daily));
+}
+async function dailyStart() {
+  const start = CITIES[city].start || 0;
+  if (vi !== start) { GAME_MODE = "daily"; setHash(city, start); switchTo(city, start); return; }   // one puzzle per city: always the start view
+  GAME_MODE = null;
+  const st = dailyState();
+  if (st && st.date === today()) { closeInfo(); stopGames(); GM.mode = "where"; GM.daily = true; setGameButtons(); return dailyResult(st); }
+  closeInfo(); stopGames();
+  card(`<h2>Günün bulmacası</h2><p>Hazırlanıyor…</p>`);
+  await featReady; if (!alive) return;
+  const date = today(), rnd = seeded(`${date}|${city}|sahneler`);
+  const cands = [...POIS.map((p) => ({ x: p.x, y: p.y, name: p.t, key: norm(p.t) })),
+                 ...ITEMS.filter((it) => it.kind === "b" && it.named && !it.dup && (it.a || 0) >= 300 && it.c !== "diger")
+                         .map((it) => ({ x: it.px, y: it.py, name: it.name, key: it.key + "|" + it.id }))]
+    .filter((p) => p.x > 300 && p.y > 220 && p.x < S.W - 300 && p.y < S.H - 220)
+    .sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+  for (let i = cands.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [cands[i], cands[j]] = [cands[j], cands[i]]; }
+  const pool = [];
+  for (const c of cands) {
+    if (pool.length === 5) break;
+    if (pool.some((q) => q.name === c.name || groundDist(q.x, q.y, c.x, c.y) < 150)) continue;
+    pool.push({ x: c.x + (rnd() - 0.5) * 100, y: c.y + (rnd() - 0.5) * 70, name: c.name });
+  }
+  GM.mode = "where"; GM.daily = date; setGameButtons(); lockNav(true); labelFilter = "none";
+  Object.assign(GM, { targets: pool, round: 0, total: 0, pts: [] });
+  whereRound();
+}
+const sq = (p) => (p >= 800 ? "🟩" : p >= 500 ? "🟨" : p >= 200 ? "🟧" : "🟥");
+const PUBLIC_URL = "https://mehmetakifakkus.github.io/sahneler/";
+const siteURL = () => (/github\.io$|netlify\.app$|^localhost$|^127\./.test(location.hostname) ? location.origin + location.pathname : PUBLIC_URL);
+const CITY_NAME = { odtu: "ODTÜ", kizilay: "Kızılay", istanbul: "İstanbul" };
+function dailyEnd() {
+  const date = GM.daily, prev = streakState();
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const yd = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, "0")}-${String(y.getDate()).padStart(2, "0")}`;
+  const streak = prev.last === date ? prev : { last: date, n: prev.last === yd ? prev.n + 1 : 1 };
+  store.set(`izo-streak-${city}`, streak);
+  const st = { date, total: GM.total, pts: GM.pts, names: GM.targets.map((t) => t.name) };
+  store.set(`izo-daily-${city}`, st);
+  dailyResult(st);
+}
+function dailyResult(st) {
+  clearPins(); GM.phase = "end"; dailyButton();
+  const max = st.pts.length * 1000, streak = streakState();
+  const text = `İzometrik Şehirler · ${CITY_NAME[city] || city} günlük #${dayNo(st.date)}\n${st.pts.map(sq).join("")}  ${st.total.toLocaleString("tr")}/${max.toLocaleString("tr")}` +
+    (streak.n > 1 ? `\n🔥 ${streak.n} gün üst üste` : "") + `\n${siteURL()}#${city}&gunluk`;
+  const now = new Date(), mid = new Date(now); mid.setHours(24, 0, 0, 0);
+  const hrs = Math.floor((mid - now) / 36e5), mins = Math.floor(((mid - now) % 36e5) / 6e4);
+  card(`<h2>Günün bulmacası #${dayNo(st.date)} <small>${streak.n > 1 ? `🔥 ${streak.n} gün` : "ilk gün"}</small></h2>
+    <div class="big">${st.total.toLocaleString("tr")} / ${max.toLocaleString("tr")}</div>
+    <div class="sqs" aria-label="Turlar">${st.pts.map((p, i) => `<span title="${esc((st.names && st.names[i]) || "")}: ${p}">${sq(p)}</span>`).join("")}</div>
+    <p>Yeni bulmaca <b>${hrs} sa ${mins} dk</b> sonra. Sonucunu paylaş, bakalım arkadaşların kaç puan alacak.</p>
+    <div class="acts"><button id="g-quit">Kapat</button><button id="g-free">Serbest oyna</button><button class="primary" id="g-share">Paylaş</button></div>`);
+  $("g-quit").onclick = () => stopGames(true);
+  $("g-free").onclick = whereStart;
+  $("g-share").onclick = () => shareText(text, "Sonuç kopyalandı, istediğin yere yapıştır");
+}
+async function shareText(text, copied, url) {
+  try { if (navigator.share && matchMedia("(pointer: coarse)").matches) { await navigator.share(url ? { title: document.title, text, url } : { text }); return; } } catch (e) { if (e && e.name === "AbortError") return; }
+  const full = url ? `${text}\n${url}` : text;
+  try { await navigator.clipboard.writeText(full); toast(copied); return; } catch (e) {}
+  const ta = document.createElement("textarea"); ta.value = full; ta.className = "copybox"; ta.rows = 4; ta.readOnly = true;
+  gameEl.appendChild(ta); ta.select(); toast("Metni seçip kopyala");
 }
 
 // ---- "Keşif" : bring the ring over a landmark and zoom in to discover it
@@ -1041,6 +1147,29 @@ function gameFrame() {
 // ------------------------------------------------------------ places: click info, search, categories
 const infoEl = $("info"), qEl = $("q"), qRes = $("qres"), catsEl = $("cats");
 let FEAT = null, IDS = null, IDW = 0, IDH = 0, ITEMS = [], SEL = null;
+let featResolve; const featReady = new Promise((r) => { featResolve = r; });
+const viewTag = () => (vi === (CITIES[city].start || 0) ? city : `${city}-${CITIES[city].views[vi].h}`);
+function placeHash(it) {
+  if (!alive) return;
+  try { history.replaceState(null, "", "#" + viewTag() + (it && it.id ? "&yer=" + encodeURIComponent(it.id) : "")); } catch (e) {}
+}
+const placeURL = (it) => `${siteURL()}#${city}&yer=${encodeURIComponent(it.id)}`;
+function issueURL(it) {
+  const body = `Yer: ${it.name}\nKimlik: ${it.id}\nHarita: ${CITY_NAME[city] || city}\nBağlantı: ${placeURL(it)}\n\nNe yanlış ya da eksik?\n- `;
+  return `https://github.com/mehmetakifakkus/sahneler/issues/new?title=${encodeURIComponent("Düzeltme: " + it.name)}&body=${encodeURIComponent(body)}`;
+}
+function findPlace(q) {
+  const byId = ITEMS.find((it) => it.id === q); if (byId) return byId;
+  const k = norm(q.replace(/[-_]+/g, " "));
+  const hits = ITEMS.filter((it) => it.named && (it.key === k || it.key.includes(k)));
+  return hits.sort((a, b) => (a.key === k ? 0 : 1) - (b.key === k ? 0 : 1) || (a.kind === "b" ? 0 : 1) - (b.kind === "b" ? 0 : 1) || a.key.length - b.key.length)[0] || null;
+}
+function handleParams() {
+  const yer = START_PARAMS.get("yer"), daily = START_PARAMS.has("gunluk");
+  START_PARAMS = new URLSearchParams();
+  if (daily) { featReady.then(() => { if (alive) dailyStart(); }); return; }
+  if (yer) featReady.then(() => { if (!alive) return; const it = findPlace(yer); if (it) openInfo(it, true); else toast("Bu yer bu haritada bulunamadı"); });
+}
 const catOn = new Set();
 const TYPE_TR = { university: "Üniversite binası", college: "Yüksekokul", school: "Okul", kindergarten: "Anaokulu", dormitory: "Yurt",
   apartments: "Apartman", residential: "Konut", house: "Ev", commercial: "Ticari bina", office: "Ofis binası", retail: "Mağaza",
@@ -1118,8 +1247,8 @@ function inRings(rings, x, y) {
       l.feat = best; best.dup = true; l.el.classList.add("link");
       l.el.addEventListener("click", (e) => { e.stopPropagation(); openInfo(l.feat); });
     }
-    buildCats();
-  } catch (e) { console.warn("Yer bilgisi yüklenemedi", e); }
+    buildCats(); featResolve();
+  } catch (e) { console.warn("Yer bilgisi yüklenemedi", e); featResolve(); }
 })();
 
 // ------------------------------------------------------------ edit mode (?duzenle): rename / recategorise / add places
@@ -1338,7 +1467,7 @@ function infoFrame() {
 const pinsSel = document.createElement("div"); pinsSel.className = "pin sel"; pinsSel.style.display = "none"; pinsEl.appendChild(pinsSel);
 const prevGameStop = gameStop;
 gameStop = () => { prevGameStop(); closeInfo(); if (editBar) editBar.remove(); featLabels.forEach((el) => el.remove()); featLabels.clear(); catsEl.innerHTML = ""; catsEl.hidden = true; qEl.value = ""; qRes.hidden = true; };
-function closeInfo() { SEL = null; pinsSel.style.display = "none"; infoEl.hidden = true; infoEl.innerHTML = ""; }
+function closeInfo() { if (SEL && SEL.id) placeHash(null); SEL = null; pinsSel.style.display = "none"; infoEl.hidden = true; infoEl.innerHTML = ""; }
 function groundM(a, b) { return Math.hypot((a.px - b.px) * res, (a.py - b.py) * res / sinE); }
 function openInfo(it, fly) {
   if (GM.mode) return;
@@ -1386,9 +1515,12 @@ function openInfo(it, fly) {
     <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
     ${inside.length ? `<div class="near in"><span>Bu binada</span>${inside.map((o, i) => `<button data-in="${i}" style="--cc:${catOf(o.c)[1]}">${esc(o.name)}</button>`).join("")}</div>` : ""}
     ${near.length ? `<div class="near"><span>Yakında</span>${near.map(([o, d], i) => `<button data-n="${i}" style="--cc:${catOf(o.c)[1]}">${esc(o.name)} <small>${Math.round(d)} m</small></button>`).join("")}</div>` : ""}
-    <div class="acts">${osm ? `<a href="${osm}" target="_blank" rel="noopener">OpenStreetMap'te aç</a>` : ""}<button id="i-close">Kapat</button></div>`;
+    <div class="links">${osm ? `<a href="${osm}" target="_blank" rel="noopener">OpenStreetMap'te gör</a><a href="${osm.replace(/\/(node|way|relation)\/(\d+)$/, "/edit?$1=$2")}" target="_blank" rel="noopener" title="Bu yerin adını ve bilgisini OpenStreetMap'te düzelt; bir sonraki güncellemede haritaya gelir">OSM'de düzelt</a>` : ""}<a href="${issueURL(it)}" target="_blank" rel="noopener">Hata bildir</a></div>
+    <div class="acts"><button id="i-close">Kapat</button><button class="primary" id="i-share">Paylaş</button></div>`;
   infoEl.hidden = false;
   $("i-close").onclick = closeInfo;
+  $("i-share").onclick = () => shareText(`${it.name} · İzometrik Şehirler`, "Bağlantı kopyalandı", placeURL(it));
+  placeHash(it);
   infoEl.querySelectorAll(".near button[data-n]").forEach((b) => { b.onclick = () => openInfo(near[+b.dataset.n][0], true); });
   infoEl.querySelectorAll(".near button[data-in]").forEach((b) => { b.onclick = () => openInfo(inside[+b.dataset.in], false); });
   if (fly) {                                   // keep the place in the strip the card and panel leave free
@@ -1451,7 +1583,11 @@ onTap = (x, y) => {
 };
 $("g-where").onclick = () => (GM.mode === "where" ? stopGames(true) : whereStart());
 $("g-explore").onclick = () => (GM.mode === "explore" ? stopGames(true) : exploreStart());
+$("g-daily").onclick = () => (GM.mode === "where" && GM.daily ? stopGames(true) : dailyStart());
+dailyButton();
 if (GAME_MODE === "explore") exploreStart();
+if (GAME_MODE === "daily") dailyStart();
+current.params = handleParams; handleParams();
 
 // ------------------------------------------------------------ photo (hi-res PNG) and 4 s video
 let capHook = null, REC = null, lastMissing = 0, shotBusy = false;
