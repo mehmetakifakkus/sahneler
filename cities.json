@@ -1,0 +1,3 @@
+{"istanbul": {"start": 0, "views": [{"h": 0, "base": "istanbul/v0/"}, {"h": 180, "base": "istanbul/v180/"}]},
+ "kizilay": {"start": 0, "views": [{"h": 45, "base": "kizilay/v45/"}, {"h": 135, "base": "kizilay/v135/"}, {"h": 225, "base": "kizilay/v225/"}, {"h": 315, "base": "kizilay/v315/"}]},
+ "odtu": {"start": 0, "cats": "all", "views": [{"h": 0, "base": "odtu/v0/"}, {"h": 90, "base": "odtu/v90/"}, {"h": 180, "base": "odtu/v180/"}, {"h": 270, "base": "odtu/v270/"}]}}
