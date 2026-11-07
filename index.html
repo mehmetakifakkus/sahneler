@@ -156,6 +156,14 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .cat small { font: 500 10px var(--font-mono); opacity: .7; }
 .cat[aria-pressed="true"] { color: var(--text); border-color: color-mix(in srgb, var(--cc) 55%, transparent); background: color-mix(in srgb, var(--cc) 14%, transparent); }
 .cat[aria-pressed="true"]::before { opacity: 1; }
+.cat.more::before { display: none; }
+.cat.more { padding-left: 9px; }
+.cat.more .chev { display: inline-block; transition: transform .15s; font-size: 10px; }
+.cat.more[aria-expanded="true"] { color: var(--text); border-color: var(--muted); }
+.cat.more[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.cats-rest { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; padding: 6px 0 0 8px; border-left: 2px solid var(--line); margin-left: 2px; }
+.cats-rest[hidden] { display: none; }
+.cats.closed .cats-rest, .cats.closed .cat.more { display: none; }
 .lbl.feat { pointer-events: auto; cursor: pointer; border: 0; font: 600 11px var(--font-body); padding: 2px 7px 2px 16px; background: rgba(250,247,240,.92); }
 .lbl.feat::before { content: ""; position: absolute; left: 6px; top: 50%; margin-top: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--cc); }
 .lbl.feat:hover { background: #fff; }
@@ -290,7 +298,7 @@ let current = null;
 const DIRS = { 0: "Kuzeye", 45: "Kuzeydoğuya", 90: "Doğuya", 135: "Güneydoğuya", 180: "Güneye", 225: "Güneybatıya", 270: "Batıya", 315: "Kuzeybatıya" };
 function parseHash() {
   const [c, h] = location.hash.slice(1).split("-");
-  const city = CITIES && c in CITIES ? c : "istanbul";
+  const city = CITIES && c in CITIES ? c : (CITIES && "odtu" in CITIES ? "odtu" : Object.keys(CITIES)[0]);
   const views = CITIES[city].views;
   let vi = views.findIndex((v) => String(v.h) === h);
   if (vi < 0) vi = CITIES[city].start || 0;
@@ -1261,6 +1269,7 @@ function editTap(x, y) {
 }
 
 // category chips + feature labels
+let catsMore = false;
 const featLabels = new Map();
 function buildCats() {
   const count = {};
@@ -1270,13 +1279,24 @@ function buildCats() {
   if (CITIES && CITIES[city].cats === "all") order.forEach((c) => catOn.add(c));
   catsEl.hidden = false;
   if (innerWidth <= 560) catsEl.classList.add("closed");
-  catsEl.innerHTML = `<button class="cats-h" aria-expanded="${!catsEl.classList.contains("closed")}">Yerler <span>▾</span></button>` + order.map((c) => {
-    const [lab, colr] = catOf(c);
-    return `<button class="cat" data-c="${c}" aria-pressed="${catOn.has(c)}" style="--cc:${colr}">${esc(lab)} <small>${count[c]}</small></button>`;
-  }).join("");
+  // the most-used categories stay visible; the rest fold into a "Diğer" chip
+  order.sort((a, b) => count[b] - count[a]);
+  const pri = ((CITIES && CITIES[city].catTop) || []).filter((c) => order.includes(c));
+  const TOP = order.length <= 8 ? order.length : pri.length ? Math.min(8, Math.max(7, pri.length)) : 7;
+  const top = [...pri, ...order.filter((c) => !pri.includes(c))].slice(0, TOP), rest = order.filter((c) => !top.includes(c));
+  const chip = (c) => { const [lab, colr] = catOf(c);
+    return `<button class="cat" data-c="${c}" aria-pressed="${catOn.has(c)}" style="--cc:${colr}">${esc(lab)} <small>${count[c]}</small></button>`; };
+  const restOn = rest.filter((c) => catOn.has(c)).length;
+  catsEl.innerHTML = `<button class="cats-h" aria-expanded="${!catsEl.classList.contains("closed")}">Yerler <span>▾</span></button>` +
+    top.map(chip).join("") +
+    (rest.length ? `<button class="cat more" id="cats-more" aria-expanded="${catsMore}" title="Diğer kategoriler">Diğer <small id="cats-more-n">${restOn}/${rest.length}</small> <span class="chev">▾</span></button>
+      <div class="cats-rest"${catsMore ? "" : " hidden"}>${rest.map(chip).join("")}</div>` : "");
   catsEl.querySelector(".cats-h").onclick = (e) => { const c = catsEl.classList.toggle("closed"); e.currentTarget.setAttribute("aria-expanded", String(!c)); };
-  catsEl.querySelectorAll(".cat").forEach((b) => b.addEventListener("click", () => {
-    const c = b.dataset.c; catOn.has(c) ? catOn.delete(c) : catOn.add(c); b.setAttribute("aria-pressed", String(catOn.has(c)));
+  const more = $("cats-more");
+  if (more) more.onclick = () => { catsMore = !catsMore; more.setAttribute("aria-expanded", String(catsMore)); catsEl.querySelector(".cats-rest").hidden = !catsMore; };
+  const restCount = () => { const n = $("cats-more-n"); if (n) n.textContent = `${rest.filter((c) => catOn.has(c)).length}/${rest.length}`; };
+  catsEl.querySelectorAll(".cat[data-c]").forEach((b) => b.addEventListener("click", () => {
+    const c = b.dataset.c; catOn.has(c) ? catOn.delete(c) : catOn.add(c); b.setAttribute("aria-pressed", String(catOn.has(c))); restCount();
     if (catOn.has(c) && cam.z / dpr < 0.2) toast("Yer adları yakınlaştırınca görünür");
   }));
 }
