@@ -44,6 +44,11 @@ Atölyeler için **ön kayıt** gerekir.
 
 Başlık (`###`), madde (`-`), tablo, **kalın**, *italik* ve bağlantı (`[metin](https://...)`) kullanılabilir.
 
-## Bir paketi sonradan düzeltmek
+## Yayındaki bir etkinliği düzeltmek
 
-Düzenleme modunda **Etkinlik → Paket yükle** ile zip'i aç, değiştir, yeniden **Paketi indir**.
+1. Etkinliği düzenleme modunda aç: `https://mehmetakifakkus.github.io/sahneler/?duzenle#odtu&etkinlik=<ad>`
+2. Üstteki etkinlik çubuğunda **Düzenle**'ye bas. Etkinlik, dosyalarıyla birlikte taslağa kopyalanır.
+3. Salonları düzelt: adı, rengi, sırası (↑ ↓), haritadaki yeri (**Yeniden işaretle**), programı, kat planındaki yeri.
+4. **Paketi indir**, zip'teki dosyaları depoda eskilerinin üzerine yükle.
+
+Elinde zip varsa **Etkinlik → Paket yükle** ile de açabilirsin.

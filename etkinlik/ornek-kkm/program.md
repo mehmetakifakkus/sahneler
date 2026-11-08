@@ -1,13 +1,13 @@
 ### Genel program (örnek)
 
-> Bu program yalnızca örnektir; gerçek bir etkinliğe ait değildir.
+> Program uydurmadır; yalnızca özelliği göstermek için. Salon adları KKM'nin kendi listesinden.
 
 | Saat | Oturum | Yer |
 |---|---|---|
-| 09:30 | Kayıt ve karşılama | Fuaye |
-| 10:00 | Açılış konuşmaları | Büyük Salon |
-| 11:00 | Paralel oturumlar 1 | Salon A · Salon B |
-| 12:30 | Öğle arası, sergi | Fuaye |
-| 14:00 | Panel | Büyük Salon |
-| 15:30 | Paralel oturumlar 2 | Salon A · Salon B |
-| 17:00 | Kapanış | Büyük Salon |
+| 09:30 | Kayıt ve karşılama | Büyük Fuaye |
+| 10:00 | Açılış konuşmaları | Kemal Kurdaş Salonu |
+| 11:00 | Paralel oturumlar 1 | A Salonu · B Salonu |
+| 12:30 | Öğle arası, sergi | Sergi Salonu |
+| 14:00 | Panel | Kemal Kurdaş Salonu |
+| 15:30 | Atölyeler | C Salonu · D Salonu |
+| 17:00 | Kapanış | Kemal Kurdaş Salonu |

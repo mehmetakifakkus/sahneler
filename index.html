@@ -1835,10 +1835,11 @@ function evMount(fly = true) {
   evBar = document.createElement("div"); evBar.className = "evbar";
   const venue = m.venue && ITEMS.find((it) => it.id === m.venue);
   evBar.innerHTML = `<span class="evb-t"><b>${esc(m.title || "Etkinlik")}</b><small>${esc([fmtRange(m.start, m.end), m.venueName || (venue && venue.name)].filter(Boolean).join(" · "))}${EV.draft ? " · taslak" : ""}</small></span>
-    <button id="evb-halls">Salonlar</button>${m.program ? '<button id="evb-prog">Program</button>' : ""}<button id="evb-x" aria-label="Etkinliği kapat">×</button>`;
+    <button id="evb-halls">Salonlar</button>${m.program ? '<button id="evb-prog">Program</button>' : ""}${EDIT && !EV.draft ? '<button id="evb-edit">Düzenle</button>' : ""}<button id="evb-x" aria-label="Etkinliği kapat">×</button>`;
   document.body.appendChild(evBar); document.body.classList.add("has-ev");
   if (innerWidth <= 560) setPanelOpen(false);
   $("evb-halls").onclick = evList;
+  if ($("evb-edit")) $("evb-edit").onclick = evEditPublished;
   if ($("evb-prog")) $("evb-prog").onclick = evProgram;
   $("evb-x").onclick = () => { EVENT_SLUG = null; closeInfo(); evClear(); placeHash(null); };
   if (fly) {
@@ -1954,9 +1955,22 @@ async function evDraftLoad() {
   const meta = (d && d.meta) || { slug: "", title: "", city, start: today(), end: today(), desc: "", venue: null, venueName: "", program: "", plans: [], halls: [] };
   return { meta, files: new Map((d && d.files) || []), urls: {}, draft: true };
 }
+// copy the published event (and its files) into the draft so it can be changed and exported again
+async function evEditPublished() {
+  if (!EV || EV.draft) return evEditor();
+  const meta = JSON.parse(JSON.stringify(EV.meta, (k, v) => (k === "_el" || k === "_w" ? undefined : v)));
+  meta.plans = meta.plans || []; meta.halls = meta.halls || [];
+  const names = [meta.program, ...meta.plans.map((p) => p.img), ...meta.halls.map((h) => h.program)].filter(Boolean);
+  const files = new Map();
+  toast("Etkinlik dosyaları alınıyor…");
+  for (const n of names) { try { const r = await fetch(evURL(n)); if (r.ok) files.set(n, await r.blob()); } catch (e) {} }
+  if (!alive) return;
+  evClear(); EVENT_SLUG = null; EV = { meta, files, urls: {}, draft: true }; EVENT_DRAFT = true;
+  await evDraftSave(); placeHash(null); evEditor(); toast("Taslak olarak açıldı: değiştir, sonra Paketi indir");
+}
 async function evDraftSave() {
   if (!EV || !EV.draft) return;
-  const meta = JSON.parse(JSON.stringify(EV.meta, (k, v) => (k === "_el" ? undefined : v)));
+  const meta = JSON.parse(JSON.stringify(EV.meta, (k, v) => (k === "_el" || k === "_w" ? undefined : v)));
   await idb.set(DRAFT_KEY(), { meta, files: [...EV.files] }).catch((e) => toast("Taslak kaydedilemedi: " + e.message));
 }
 function evAddFile(file) {
@@ -1970,7 +1984,8 @@ const pickFile = (accept) => new Promise((res) => {
   inp.onchange = () => res(inp.files[0] || null); inp.click();
 });
 async function evEditor() {
-  if (!EV || !EV.draft) { evClear(); EV = await evDraftLoad(); }
+  if (EV && !EV.draft) return evEditPublished();
+  if (!EV) EV = await evDraftLoad();
   EVENT_DRAFT = true; evMount(false);
   const m = EV.meta;
   const fileRow = (label, key, accept) => `<div class="fld">${label}<span class="frow"><span class="fname">${m[key] ? esc(m[key]) : "<i>yok</i>"}</span><button data-file="${key}" data-acc="${accept}">${m[key] ? "Değiştir" : "Dosya seç"}</button>${m[key] ? `<button data-clear="${key}" class="ghost">Kaldır</button>` : ""}</span></div>`;
@@ -2024,12 +2039,12 @@ function evHallEditor(h) {
   infoBody.innerHTML = `<h2>Salon</h2>
     <label class="fld">Ad<input id="eh-name" value="${esc(h.name || "")}"></label>
     <div class="frow2"><label class="fld">Renk<input id="eh-color" type="color" value="${esc(h.color || "#f0b429")}"></label>
-      <div class="fld">Haritadaki yeri<span class="frow"><span class="fname">${h.x == null ? "<i>yok</i>" : "işaretli"}</span><button id="eh-map">Haritada işaretle</button></span></div></div>
+      <div class="fld">Haritadaki yeri<span class="frow"><span class="fname">${h.x == null ? "<i>yok</i>" : "işaretli"}</span><button id="eh-map">${h.x == null ? "Haritada işaretle" : "Yeniden işaretle"}</button></span></div></div>
     <label class="fld">Kısa açıklama<input id="eh-desc" value="${esc(h.desc || "")}" placeholder="örn. 1. kat · 400 kişilik"></label>
     <div class="fld">Program (.md, .png, .jpg, .pdf)<span class="frow"><span class="fname">${h.program ? esc(h.program) : "<i>yok</i>"}</span><button id="eh-prog">${h.program ? "Değiştir" : "Dosya seç"}</button></span></div>
     ${m.plans.length ? `<label class="fld">Kat planı<select id="eh-plan"><option value="">(yok)</option>${m.plans.map((p) => `<option value="${p.id}"${p.id === h.plan ? " selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>
       ${plan ? `<div class="evplan edit"><span class="evplan-n">Plan üzerinde salonun yerine tıkla</span><div class="evplan-i" id="eh-planimg"><img src="${evURL(plan.img)}" alt="">${h.px != null ? `<i class="mk" style="left:${h.px * 100}%;top:${h.py * 100}%;--cc:${h.color}"></i>` : ""}</div></div>` : ""}` : `<p class="sub">Kat planı eklersen salonu plan üzerinde de işaretleyebilirsin.</p>`}
-    <div class="acts"><button id="eh-back" class="primary">Tamam</button></div>`;
+    <div class="acts"><span><button id="eh-up" class="ghost" title="Listede yukarı">↑</button> <button id="eh-down" class="ghost" title="Listede aşağı">↓</button></span><button id="eh-back" class="primary">Tamam</button></div>`;
   infoEl.hidden = false;
   const sync = () => { h.name = $("eh-name").value.trim() || "Salon"; h.color = $("eh-color").value; h.desc = $("eh-desc").value.trim();
     if ($("eh-plan")) { const v = $("eh-plan").value || null; if (v !== h.plan) { h.plan = v; h.px = h.py = null; } } evDraftSave(); evMount(false); };
@@ -2042,6 +2057,8 @@ function evHallEditor(h) {
   const pi = $("eh-planimg");
   if (pi) pi.onclick = (e) => { const r = pi.getBoundingClientRect(); h.px = Math.round((e.clientX - r.left) / r.width * 1000) / 1000; h.py = Math.round((e.clientY - r.top) / r.height * 1000) / 1000; sync(); evHallEditor(h); };
   $("eh-back").onclick = () => { sync(); evEditor(); };
+  const move = (d) => { const i = m.halls.indexOf(h), j = i + d; if (j < 0 || j >= m.halls.length) return; [m.halls[i], m.halls[j]] = [m.halls[j], m.halls[i]]; sync(); toast(`Sıra: ${j + 1}`); };
+  $("eh-up").onclick = () => move(-1); $("eh-down").onclick = () => move(1);
 }
 function evPick(p) { EVPICK = p; document.body.classList.toggle("picking", !!p); }
 function evPickAt(x, y) {
@@ -2103,7 +2120,7 @@ async function evExport() {
   if (!m.halls.length) { toast("En az bir salon ekle"); return; }
   m.slug = m.slug || slugify(m.title);
   const dir = `${EV_DIR}${m.slug}/`, enc = new TextEncoder();
-  const meta = JSON.parse(JSON.stringify(m, (k, v) => (k === "_el" ? undefined : v)));
+  const meta = JSON.parse(JSON.stringify(m, (k, v) => (k === "_el" || k === "_w" ? undefined : v)));
   const entries = [{ name: dir + "event.json", data: enc.encode(JSON.stringify(meta, null, 2)) }];
   const used = new Set([m.program, ...m.plans.map((p) => p.img), ...m.halls.map((h) => h.program)].filter(Boolean));
   for (const [name, blob] of EV.files) if (used.has(name)) entries.push({ name: dir + name, data: new Uint8Array(await blob.arrayBuffer()) });

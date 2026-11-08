@@ -1,4 +1,4 @@
-### Salon B (örnek)
+### B Salonu (örnek)
 
 | Saat | Oturum |
 |---|---|

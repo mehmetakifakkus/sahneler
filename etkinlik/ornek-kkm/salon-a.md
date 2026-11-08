@@ -1,4 +1,4 @@
-### Salon A (örnek)
+### A Salonu (örnek)
 
 | Saat | Oturum |
 |---|---|
