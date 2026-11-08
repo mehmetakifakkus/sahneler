@@ -1,0 +1,72 @@
+{
+  "slug": "ornek-kkm",
+  "title": "Örnek etkinlik: KKM'de bir gün",
+  "city": "odtu",
+  "start": "2026-11-20",
+  "end": "2026-11-21",
+  "desc": "Bu bir örnektir: salon iğnelerini, kat planını ve programı göstermek için hazırlandı. Salon adları ve program gerçek değildir.",
+  "venue": "w423686191",
+  "venueName": "ODTÜ Kültür ve Kongre Merkezi",
+  "program": "program.md",
+  "plans": [
+    {
+      "id": "p1",
+      "name": "Şematik plan (örnek)",
+      "img": "plan.png"
+    }
+  ],
+  "halls": [
+    {
+      "id": "h1",
+      "name": "Büyük Salon",
+      "color": "#e5484d",
+      "desc": "Zemin kat · yaklaşık 1.000 kişi (örnek)",
+      "program": "buyuk-salon.md",
+      "plan": "p1",
+      "px": 0.261,
+      "py": 0.482,
+      "x": 250.1,
+      "y": 264.1,
+      "z": 12.8
+    },
+    {
+      "id": "h2",
+      "name": "Salon A",
+      "color": "#4f8cff",
+      "desc": "1. kat (örnek)",
+      "program": "salon-a.md",
+      "plan": "p1",
+      "px": 0.652,
+      "py": 0.587,
+      "x": 288.8,
+      "y": 289.3,
+      "z": 12.8
+    },
+    {
+      "id": "h3",
+      "name": "Salon B",
+      "color": "#2ec27e",
+      "desc": "1. kat (örnek)",
+      "program": "salon-b.md",
+      "plan": "p1",
+      "px": 0.652,
+      "py": 0.376,
+      "x": 267.2,
+      "y": 307.0,
+      "z": 12.8
+    },
+    {
+      "id": "h4",
+      "name": "Fuaye · Sergi alanı",
+      "color": "#f0b429",
+      "desc": "Zemin kat, giriş (örnek)",
+      "program": "fuaye.md",
+      "plan": "p1",
+      "px": 0.457,
+      "py": 0.482,
+      "x": 264.1,
+      "y": 281.1,
+      "z": 12.8
+    }
+  ]
+}

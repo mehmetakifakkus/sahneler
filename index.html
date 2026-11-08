@@ -209,6 +209,89 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .game.info .fld :focus { border-color: var(--accent); }
 .game.info .linkbtn { background: none; border: 0; color: var(--accent); font-size: 12px; text-align: left; padding: 0; cursor: pointer; }
 .game.info .acts .ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+/* events */
+.picking .lbl, .picking .evpin { pointer-events: none !important; }
+.picking canvas { cursor: crosshair; }
+.evbox { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+.evpin { position: absolute; left: 0; top: 0; pointer-events: auto; display: flex; align-items: center; gap: 6px; transform-origin: 0 0;
+  margin: -34px 0 0 -14px; padding: 3px 9px 3px 3px; border: 0; border-radius: 999px; background: #fffdf6; color: #1b1f24; cursor: pointer;
+  font: 700 12px var(--font-body); box-shadow: 0 3px 10px rgba(0,0,0,.35), 0 0 0 2px var(--cc); white-space: nowrap; }
+.evbox.compact .evpin { padding-right: 3px; }
+.evbox.compact .evpin span { display: none; }
+.evbox.compact .evpin:hover span { display: inline; }
+.evpin b { width: 22px; height: 22px; border-radius: 50%; background: var(--cc); color: #fff; display: grid; place-items: center; font-size: 12px; }
+.evpin::after { content: ""; position: absolute; left: 10px; top: 100%; border: 6px solid transparent; border-top-color: var(--cc); }
+.evpin:hover { transform-origin: 0 0; filter: brightness(1.05); box-shadow: 0 4px 14px rgba(0,0,0,.45), 0 0 0 3px var(--cc); }
+.evtip { position: fixed; z-index: 8; width: 320px; max-height: 60vh; overflow: hidden; background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  border-radius: 10px; padding: 12px 14px; box-shadow: 0 10px 28px rgba(0,0,0,.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 12.5px; pointer-events: none; }
+.evtip[hidden] { display: none; }
+.evtip h4 { margin: 0 0 6px; font: 700 14px var(--font-body); display: flex; gap: 8px; align-items: center; }
+.evtip h4::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--cc); }
+.evtip p { margin: 0 0 6px; color: var(--muted); }
+.evtip small { display: block; margin-top: 6px; color: var(--accent); font: 500 11px var(--font-mono); }
+.evtip-b { max-height: 34vh; overflow: hidden; -webkit-mask-image: linear-gradient(#000 75%, transparent); mask-image: linear-gradient(#000 75%, transparent); }
+.evtip-b img, .evimg { width: 100%; border-radius: 6px; display: block; }
+.evbar { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; gap: 8px; align-items: center; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 10px; padding: 6px 6px 6px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); max-width: calc(100vw - 420px); }
+.editing .evbar { top: 60px; }
+.evb-t { display: flex; flex-direction: column; min-width: 0; }
+.evb-t b { font: 700 13.5px var(--font-body); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.evb-t small { font: 500 11px var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.evbar button { font: 600 12px var(--font-body); border-radius: 7px; padding: 7px 10px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--text); }
+.evbar #evb-halls { background: var(--accent); color: #1b1f24; border-color: var(--accent); }
+.evbar #evb-x { border: 0; color: var(--muted); font-size: 18px; padding: 2px 8px; }
+.evlist-p { display: flex; flex-direction: column; gap: 5px; }
+.evlist-p[hidden] { display: none; }
+.evlist-p button { text-align: left; font: 600 12.5px var(--font-body); color: var(--text); background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.evl-d { font: 500 10.5px var(--font-mono); color: var(--accent); }
+.game.info .evkick { margin: 0; font: 500 11px var(--font-mono); color: var(--accent); }
+.game.info .evdesc { margin: 0; color: var(--muted); font-size: 12.5px; }
+.game.info .evh { display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
+.game.info .evh b { width: 24px; height: 24px; border-radius: 50%; background: var(--cc); color: #fff; display: grid; place-items: center; font-size: 13px; flex: none; }
+.evlist { display: flex; flex-direction: column; gap: 6px; }
+.evlist button { display: flex; gap: 10px; align-items: center; text-align: left; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; color: var(--text); font: 600 13px var(--font-body); cursor: pointer; }
+.evlist button:hover { border-color: var(--cc); }
+.evlist button b { width: 22px; height: 22px; border-radius: 50%; background: var(--cc); color: #fff; display: grid; place-items: center; font-size: 12px; flex: none; }
+.evlist small { display: block; font: 500 11.5px var(--font-body); color: var(--muted); }
+.evplan { display: flex; flex-direction: column; gap: 4px; }
+.evplan-n { font: 500 11px var(--font-mono); color: var(--muted); }
+.evplan-i { position: relative; border-radius: 7px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+.evplan.edit .evplan-i { cursor: crosshair; }
+.evplan-i img { display: block; width: 100%; }
+.evplan-i .mk { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--cc); box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--cc); animation: evpulse 1.4s infinite; }
+.evplan-i .mk.o { width: 12px; height: 12px; margin: -6px 0 0 -6px; box-shadow: 0 0 0 2px #fff; animation: none; opacity: .75; cursor: pointer; }
+@keyframes evpulse { 50% { box-shadow: 0 0 0 3px #fff, 0 0 0 9px color-mix(in srgb, var(--cc) 35%, transparent); } }
+.evdoc .md, .evtip-b .md { font-size: 12.8px; line-height: 1.5; }
+.md h3, .md h4, .md h5, .md h6 { margin: 10px 0 4px; font: 700 13.5px var(--font-body); color: var(--text); }
+.md h3 { font-size: 15px; }
+.md p { margin: 0 0 8px; } .md ul, .md ol { margin: 0 0 8px; padding-left: 18px; }
+.md table { width: 100%; border-collapse: collapse; margin: 4px 0 8px; font-size: 12px; }
+.md th, .md td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.md th { color: var(--muted); font-weight: 600; } .md td:first-child { font-family: var(--font-mono); white-space: nowrap; color: var(--accent); }
+.md blockquote { margin: 0 0 8px; padding-left: 10px; border-left: 3px solid var(--line); color: var(--muted); }
+.md code { font-family: var(--font-mono); font-size: 11.5px; background: rgba(255,255,255,.06); padding: 1px 4px; border-radius: 4px; }
+.md img { max-width: 100%; border-radius: 6px; }
+.evcta { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px; border-radius: 8px; background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); font-size: 12.5px; }
+.evcta button { align-self: flex-start; font: 600 12px var(--font-body); background: var(--accent); color: #1b1f24; border: 0; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.game.info .frow { display: flex; gap: 6px; align-items: center; color: var(--text); }
+.game.info .frow .fname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px var(--font-mono); }
+.game.info .frow button, .game.info .fld > button, .game.info .erow button { font: 600 11.5px var(--font-body); border-radius: 6px; padding: 5px 9px; cursor: pointer; border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--text); }
+.game.info .fld > button { align-self: flex-start; }
+.game.info .frow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.game.info .fld input[type="color"] { padding: 2px; height: 32px; }
+.elist { display: flex; flex-direction: column; gap: 4px; color: var(--text); }
+.erow { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 5px 7px; border-radius: 6px; background: rgba(255,255,255,.04); font-size: 12.5px; }
+.erow b { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--cc, #888); color: #fff; font-size: 11px; margin-right: 4px; }
+.erow > span:last-child { display: flex; gap: 4px; }
+@media (max-width: 560px) {
+  .evbar { top: 10px; left: 10px; right: 62px; transform: none; max-width: none; padding-left: 10px; }
+  .editing .evbar { top: 56px; }
+  .evbar #evb-prog { display: none; }
+  .has-ev .game.info { top: 72px; }
+  .has-ev .panel { display: none; }
+}
 .toast { position: fixed; left: 50%; top: 22px; transform: translateX(-50%); background: var(--accent); color: #1b1f24; font: 700 13px var(--font-body);
   padding: 8px 14px; border-radius: 999px; z-index: 6; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; transition: opacity .4s; }
 @media (max-width: 560px) { .game { top: 56px; right: 10px; width: calc(100vw - 20px); } .game.info { top: 10px; max-height: 34vh; overflow-y: auto; gap: 8px; } }
@@ -258,6 +341,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
   </div>
   <div class="ramp" id="ramp"><div></div><div><span>0 m</span><span>45 m</span><span>90 m</span></div></div>
   <div class="legend" id="legend"></div>
+  <div class="evlist-p" id="evlist" hidden></div>
   <div class="search">
     <input id="q" type="search" placeholder="Yer ara: kütüphane, yurt, kafe…" autocomplete="off" aria-label="Haritada yer ara">
     <ul id="qres" role="listbox" hidden></ul>
@@ -304,6 +388,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 // cities.json: city -> {views: [{h, base}], start}; each view folder holds scene.json + tile pyramid
 let CITIES = null;
 let GAME_MODE = null;      // survives view switches (explore mode)
+let EVENT_SLUG = null, EVENT_DRAFT = false;   // active event survives view switches too
 let current = null;
 const DIRS = { 0: "Kuzeye", 45: "Kuzeydoğuya", 90: "Doğuya", 135: "Güneydoğuya", 180: "Güneye", 225: "Güneybatıya", 270: "Batıya", 315: "Kuzeybatıya" };
 const hashParams = () => new URLSearchParams(location.hash.slice(1).split("&").slice(1).join("&"));
@@ -318,7 +403,7 @@ function parseHash() {
 }
 function setHash(city, vi) {
   const v = CITIES[city].views[vi], tag = vi === (CITIES[city].start || 0) ? city : `${city}-${v.h}`;
-  try { history.replaceState(null, "", "#" + tag); } catch (e) {}
+  try { history.replaceState(null, "", "#" + tag + (EVENT_SLUG ? "&etkinlik=" + encodeURIComponent(EVENT_SLUG) : "")); } catch (e) {}
 }
 function switchTo(city, vi, keep) {
   const keepView = keep || null;
@@ -338,6 +423,7 @@ function rotate(step) {
 document.querySelectorAll("[data-city]").forEach((b) => b.addEventListener("click", () => {
   if (!CITIES || b.dataset.city === current?.city || current?.busy) return;
   const vi = CITIES[b.dataset.city].start || 0;
+  EVENT_SLUG = null; EVENT_DRAFT = false;
   setHash(b.dataset.city, vi); switchTo(b.dataset.city, vi);
 }));
 document.getElementById("v-left").addEventListener("click", () => rotate(-1));
@@ -1151,7 +1237,7 @@ let featResolve; const featReady = new Promise((r) => { featResolve = r; });
 const viewTag = () => (vi === (CITIES[city].start || 0) ? city : `${city}-${CITIES[city].views[vi].h}`);
 function placeHash(it) {
   if (!alive) return;
-  try { history.replaceState(null, "", "#" + viewTag() + (it && it.id ? "&yer=" + encodeURIComponent(it.id) : "")); } catch (e) {}
+  try { history.replaceState(null, "", "#" + viewTag() + (EVENT_SLUG ? "&etkinlik=" + encodeURIComponent(EVENT_SLUG) : "") + (it && it.id ? "&yer=" + encodeURIComponent(it.id) : "")); } catch (e) {}
 }
 const placeURL = (it) => `${siteURL()}#${city}&yer=${encodeURIComponent(it.id)}`;
 function issueURL(it) {
@@ -1165,8 +1251,9 @@ function findPlace(q) {
   return hits.sort((a, b) => (a.key === k ? 0 : 1) - (b.key === k ? 0 : 1) || (a.kind === "b" ? 0 : 1) - (b.kind === "b" ? 0 : 1) || a.key.length - b.key.length)[0] || null;
 }
 function handleParams() {
-  const yer = START_PARAMS.get("yer"), daily = START_PARAMS.has("gunluk");
+  const yer = START_PARAMS.get("yer"), daily = START_PARAMS.has("gunluk"), ev = START_PARAMS.get("etkinlik");
   START_PARAMS = new URLSearchParams();
+  if (ev && ev !== (EV && !EV.draft && EV.meta.slug)) { EVENT_SLUG = ev; loadEvent(ev); }
   if (daily) { featReady.then(() => { if (alive) dailyStart(); }); return; }
   if (yer) featReady.then(() => { if (!alive) return; const it = findPlace(yer); if (it) openInfo(it, true); else toast("Bu yer bu haritada bulunamadı"); });
 }
@@ -1449,6 +1536,7 @@ function infoFrame() {
     const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(l.el.style.transform); if (m) placed.push([+m[1], +m[2], l.w, l.h]);
   }
   const cw = canvas.clientWidth, ch = canvas.clientHeight;
+  placed.push(...evRects);                       // event pins win over place names
   for (const it of ITEMS) {
     const want = show && catOn.has(it.c) && (it.named || it.kind === "p") && !it.dup;
     let el = featLabels.get(it);
@@ -1466,7 +1554,7 @@ function infoFrame() {
 // selection pin + info card
 const pinsSel = document.createElement("div"); pinsSel.className = "pin sel"; pinsSel.style.display = "none"; pinsEl.appendChild(pinsSel);
 const prevGameStop = gameStop;
-gameStop = () => { prevGameStop(); closeInfo(); if (editBar) editBar.remove(); featLabels.forEach((el) => el.remove()); featLabels.clear(); catsEl.innerHTML = ""; catsEl.hidden = true; qEl.value = ""; qRes.hidden = true; };
+gameStop = () => { prevGameStop(); closeInfo(); if (editBar) editBar.remove(); evClear(); evBox.remove(); evTip.remove(); featLabels.forEach((el) => el.remove()); featLabels.clear(); catsEl.innerHTML = ""; catsEl.hidden = true; qEl.value = ""; qRes.hidden = true; };
 function closeInfo() { if (SEL && SEL.id) placeHash(null); SEL = null; pinsSel.style.display = "none"; infoEl.hidden = true; infoEl.innerHTML = ""; }
 function groundM(a, b) { return Math.hypot((a.px - b.px) * res, (a.py - b.py) * res / sinE); }
 function openInfo(it, fly) {
@@ -1519,6 +1607,11 @@ function openInfo(it, fly) {
     <div class="acts"><button id="i-close">Kapat</button><button class="primary" id="i-share">Paylaş</button></div>`;
   infoEl.hidden = false;
   $("i-close").onclick = closeInfo;
+  if (EV && EV.meta.venue === it.id) {
+    const d = document.createElement("div"); d.className = "evcta";
+    d.innerHTML = `<span>Burada etkinlik var: <b>${esc(EV.meta.title || "")}</b></span><button>Salonlar ve program</button>`;
+    d.querySelector("button").onclick = evList; infoEl.insertBefore(d, infoEl.querySelector(".links"));
+  }
   $("i-share").onclick = () => shareText(`${it.name} · İzometrik Şehirler`, "Bağlantı kopyalandı", placeURL(it));
   placeHash(it);
   infoEl.querySelectorAll(".near button[data-n]").forEach((b) => { b.onclick = () => openInfo(near[+b.dataset.n][0], true); });
@@ -1531,6 +1624,7 @@ function openInfo(it, fly) {
 }
 function infoTap(x, y) {
   if (!FEAT) return;
+  if (EVPICK) return evPickAt(x, y);
   if (EDIT) return editTap(x, y);
   const ix = Math.floor(x / 4), iy = Math.floor(y / 4);
   if (ix >= 0 && iy >= 0 && ix < IDW && iy < IDH) {
@@ -1575,6 +1669,404 @@ function pickHit(it) {
   if (it.lab) { flyTo(it.px, it.py, Math.max(cam.z, 0.9 * dpr)); closeInfo(); return; }
   openInfo(it, true);
 }
+
+// ------------------------------------------------------------ events: halls on the map, floor plans, programmes
+// A published event lives in etkinlik/<slug>/ (event.json + programme / plan files); etkinlik/index.json lists them.
+// Drafts (edit mode) keep their files in IndexedDB and export as a zip laid out the same way.
+const EV_DIR = "etkinlik/";
+let EV = null, EVPICK = null;
+const evBox = document.createElement("div"); evBox.className = "evbox"; document.body.appendChild(evBox);
+const evTip = document.createElement("div"); evTip.className = "evtip"; evTip.hidden = true; document.body.appendChild(evTip);
+let evBar = null;
+const idb = (() => {
+  let p = null;
+  const open = () => p || (p = new Promise((res, rej) => {
+    const r = indexedDB.open("izo", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }));
+  const run = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => {
+    const q = fn(db.transaction("kv", mode).objectStore("kv")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); };
+  return { get: (k) => run("readonly", (s) => s.get(k)), set: (k, v) => run("readwrite", (s) => s.put(v, k)), del: (k) => run("readwrite", (s) => s.delete(k)) };
+})();
+const DRAFT_KEY = () => `ev-draft-${city}`;
+const slugify = (s) => norm(s).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "etkinlik";
+const fmtDate = (d) => { try { return new Date(d + "T12:00:00").toLocaleDateString("tr", { day: "numeric", month: "long" }); } catch (e) { return d; } };
+function fmtRange(a, b) {
+  if (!a) return ""; if (!b || a === b) return fmtDate(a);
+  const [ya, ma] = a.split("-"), [yb, mb] = b.split("-");
+  if (ya === yb && ma === mb) return `${+a.split("-")[2]}–${fmtDate(b)}`;
+  return `${fmtDate(a)} – ${fmtDate(b)}`;
+}
+function evURL(name) {
+  if (!EV || !name) return "";
+  if (EV.files) { if (!EV.urls[name] && EV.files.get(name)) EV.urls[name] = URL.createObjectURL(EV.files.get(name)); return EV.urls[name] || ""; }
+  return EV.base + encodeURIComponent(name);
+}
+const isImg = (n) => /\.(png|jpe?g|webp|gif|svg)$/i.test(n || "");
+const isMd = (n) => /\.(md|markdown|txt)$/i.test(n || "");
+async function evText(name) {
+  if (EV.files) { const b = EV.files.get(name); return b ? await b.text() : ""; }
+  const r = await fetch(evURL(name)); return r.ok ? await r.text() : "";
+}
+// tiny, safe markdown: headings, lists, tables, quotes, bold/italic/code, links, images
+function md(src) {
+  const inl = (t) => esc(t)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (m, a, u) => `<img alt="${a}" src="${/^https?:/.test(u) ? u : evURL(u.replace(/&amp;/g, "&"))}">`)
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<i>$2</i>");
+  const L = String(src || "").replace(/\r/g, "").split("\n"), out = [];
+  for (let i = 0; i < L.length;) {
+    const l = L[i];
+    if (!l.trim()) { i++; continue; }
+    let m;
+    if ((m = /^(#{1,4})\s+(.*)/.exec(l))) { const n = Math.min(4, m[1].length + 2); out.push(`<h${n}>${inl(m[2])}</h${n}>`); i++; continue; }
+    if (/^\s*\|/.test(l)) {
+      const rows = []; while (i < L.length && /^\s*\|/.test(L[i])) rows.push(L[i++]);
+      const cells = (r) => r.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const body = rows.filter((r) => !/^\s*\|?\s*:?-{2,}/.test(r));
+      const head = rows.length > 1 && /^\s*\|?\s*:?-{2,}/.test(rows[1]) ? cells(body.shift()) : null;
+      out.push(`<table>${head ? `<thead><tr>${head.map((c) => `<th>${inl(c)}</th>`).join("")}</tr></thead>` : ""}<tbody>${body.map((r) => `<tr>${cells(r).map((c) => `<td>${inl(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`);
+      continue;
+    }
+    if (/^\s*([-*+]|\d+[.)])\s+/.test(l)) {
+      const ol = /^\s*\d/.test(l), items = [];
+      while (i < L.length && /^\s*([-*+]|\d+[.)])\s+/.test(L[i])) items.push(L[i++].replace(/^\s*([-*+]|\d+[.)])\s+/, ""));
+      out.push(`<${ol ? "ol" : "ul"}>${items.map((t) => `<li>${inl(t)}</li>`).join("")}</${ol ? "ol" : "ul"}>`); continue;
+    }
+    if (/^>\s?/.test(l)) { const q = []; while (i < L.length && /^>\s?/.test(L[i])) q.push(L[i++].replace(/^>\s?/, "")); out.push(`<blockquote>${inl(q.join(" "))}</blockquote>`); continue; }
+    const p = []; while (i < L.length && L[i].trim() && !/^(#{1,4}\s|\s*\||\s*([-*+]|\d+[.)])\s|>)/.test(L[i])) p.push(L[i++]);
+    out.push(`<p>${p.map(inl).join("<br>")}</p>`);
+  }
+  return out.join("");
+}
+async function evDoc(name) {
+  if (!name) return "";
+  if (isImg(name)) return `<a href="${evURL(name)}" target="_blank" rel="noopener"><img class="evimg" src="${evURL(name)}" alt="Program"></a>`;
+  if (/\.pdf$/i.test(name)) return `<p><a href="${evURL(name)}" target="_blank" rel="noopener">Programı aç (PDF)</a></p>`;
+  return `<div class="md">${md(await evText(name))}</div>`;
+}
+const hallPx = (h) => ptPx(h.x, h.y, h.z || 0);
+function evClear() {
+  evBox.innerHTML = ""; evTip.hidden = true; if (evBar) { evBar.remove(); evBar = null; }
+  if (EV && EV.urls) Object.values(EV.urls).forEach((u) => URL.revokeObjectURL(u));
+  EV = null; document.body.classList.remove("has-ev");
+}
+function evMount(fly = true) {
+  evBox.innerHTML = ""; const m = EV.meta;
+  (m.halls || []).forEach((h, i) => {
+    if (h.x == null) return;
+    const el = document.createElement("button"); el.className = "evpin"; el.style.setProperty("--cc", h.color || "#f0b429");
+    el.innerHTML = `<b>${i + 1}</b><span>${esc(h.name || "Salon")}</span>`;
+    el.onclick = (e) => { e.stopPropagation(); evTip.hidden = true; evHall(h); };
+    el.onmouseenter = () => evPreview(h, el); el.onmouseleave = () => { evTip.hidden = true; };
+    h._el = el; evBox.appendChild(el);
+  });
+  if (evBar) evBar.remove();
+  evBar = document.createElement("div"); evBar.className = "evbar";
+  const venue = m.venue && ITEMS.find((it) => it.id === m.venue);
+  evBar.innerHTML = `<span class="evb-t"><b>${esc(m.title || "Etkinlik")}</b><small>${esc([fmtRange(m.start, m.end), m.venueName || (venue && venue.name)].filter(Boolean).join(" · "))}${EV.draft ? " · taslak" : ""}</small></span>
+    <button id="evb-halls">Salonlar</button>${m.program ? '<button id="evb-prog">Program</button>' : ""}<button id="evb-x" aria-label="Etkinliği kapat">×</button>`;
+  document.body.appendChild(evBar); document.body.classList.add("has-ev");
+  $("evb-halls").onclick = evList;
+  if ($("evb-prog")) $("evb-prog").onclick = evProgram;
+  $("evb-x").onclick = () => { EVENT_SLUG = null; closeInfo(); evClear(); placeHash(null); };
+  if (fly) {
+    const pts = (m.halls || []).filter((h) => h.x != null).map(hallPx);
+    if (venue) pts.push([venue.px, venue.py]);
+    if (pts.length) {
+      const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+      const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+      const span = Math.max(Math.max(...xs) - Math.min(...xs) + 400, (Math.max(...ys) - Math.min(...ys) + 300) * W / H);
+      flyTo(cx, cy, Math.min(Math.max(W / span, cam.z), 1.4 * dpr));
+    }
+  }
+}
+let evRects = [];
+function eventFrame() {
+  evRects = [];
+  if (!EV) return;
+  const hide = !!GM.mode, pos = [];
+  for (const h of EV.meta.halls || []) if (h._el && !hide) { const p = hallPx(h); pos.push(toCss(p[0], p[1])); }
+  // pins that would overlap shrink to their number
+  const tight = pos.some((a, i) => pos.some((b, j) => j > i && Math.abs(a[0] - b[0]) < 130 && Math.abs(a[1] - b[1]) < 34));
+  evBox.classList.toggle("compact", tight);
+  for (const h of EV.meta.halls || []) {
+    if (!h._el) continue;
+    if (hide) { h._el.style.display = "none"; continue; }
+    const p = hallPx(h), s = toCss(p[0], p[1]);
+    h._el.style.display = ""; h._el.style.transform = `translate(${Math.round(s[0])}px, ${Math.round(s[1])}px)`;
+    evRects.push([s[0] - 18, s[1] - 38, (tight ? 30 : (h._w || (h._w = h._el.offsetWidth))) + 8, 34]);
+  }
+}
+let tipFor = null;
+async function evPreview(h, el) {
+  if (matchMedia("(pointer: coarse)").matches) return;
+  tipFor = h;
+  const r = el.getBoundingClientRect();
+  evTip.innerHTML = `<h4 style="--cc:${h.color || "#f0b429"}">${esc(h.name || "Salon")}</h4>${h.desc ? `<p>${esc(h.desc)}</p>` : ""}<div class="evtip-b">…</div><small>Tıkla: kat planı ve tam program</small>`;
+  evTip.style.left = Math.min(innerWidth - 330, r.right + 8) + "px"; evTip.style.top = Math.max(8, r.top - 10) + "px"; evTip.hidden = false;
+  const body = await evDoc(h.program);
+  if (tipFor === h && !evTip.hidden) evTip.querySelector(".evtip-b").innerHTML = body || "<p>Bu salon için program eklenmemiş.</p>";
+}
+function evHeader(sub) {
+  const m = EV.meta;
+  return `<p class="evkick">${esc(m.title || "Etkinlik")}${m.start ? " · " + esc(fmtRange(m.start, m.end)) : ""}</p>${sub || ""}`;
+}
+function evList() {
+  SEL = null; pinsSel.style.display = "none";
+  const m = EV.meta, halls = m.halls || [];
+  infoEl.innerHTML = evHeader(`<h2>Salonlar</h2>`) + (m.desc ? `<p class="evdesc">${esc(m.desc)}</p>` : "") +
+    `<div class="evlist">${halls.map((h, i) => `<button data-h="${i}" style="--cc:${h.color || "#f0b429"}"><b>${i + 1}</b><span>${esc(h.name || "Salon")}${h.desc ? `<small>${esc(h.desc)}</small>` : ""}</span></button>`).join("") || "<p>Henüz salon eklenmemiş.</p>"}</div>
+    <div class="acts">${m.program ? '<button id="ev-prog">Genel program</button>' : ""}<button id="i-close">Kapat</button><button class="primary" id="ev-share">Paylaş</button></div>`;
+  infoEl.hidden = false;
+  infoEl.querySelectorAll(".evlist button").forEach((b) => b.onclick = () => evHall(halls[+b.dataset.h], true));
+  $("i-close").onclick = closeInfo; if ($("ev-prog")) $("ev-prog").onclick = evProgram;
+  $("ev-share").onclick = evShare;
+}
+function evShare() {
+  if (EV.draft) { toast("Taslak etkinlik paylaşılamaz; önce yayınla"); return; }
+  shareText(`${EV.meta.title} · ${fmtRange(EV.meta.start, EV.meta.end)}`, "Etkinlik bağlantısı kopyalandı", `${siteURL()}#${city}&etkinlik=${encodeURIComponent(EV.meta.slug)}`);
+}
+async function evProgram() {
+  SEL = null; pinsSel.style.display = "none";
+  infoEl.innerHTML = evHeader(`<h2>Genel program</h2>`) + `<div class="evdoc">Yükleniyor…</div><div class="acts"><button id="ev-back">Salonlar</button><button id="i-close">Kapat</button></div>`;
+  infoEl.hidden = false; $("i-close").onclick = closeInfo; $("ev-back").onclick = evList;
+  infoEl.querySelector(".evdoc").innerHTML = (await evDoc(EV.meta.program)) || "<p>Program eklenmemiş.</p>";
+}
+function planHTML(h) {
+  const plan = (EV.meta.plans || []).find((p) => p.id === h.plan); if (!plan) return "";
+  const others = (EV.meta.halls || []).filter((o) => o !== h && o.plan === plan.id && o.px != null);
+  return `<div class="evplan"><span class="evplan-n">${esc(plan.name || "Kat planı")}</span><div class="evplan-i"><img src="${evURL(plan.img)}" alt="${esc(plan.name || "Kat planı")}">
+    ${others.map((o) => `<i class="mk o" data-h="${EV.meta.halls.indexOf(o)}" style="left:${o.px * 100}%;top:${o.py * 100}%;--cc:${o.color || "#888"}" title="${esc(o.name)}"></i>`).join("")}
+    ${h.px != null ? `<i class="mk" style="left:${h.px * 100}%;top:${h.py * 100}%;--cc:${h.color || "#f0b429"}"></i>` : ""}</div></div>`;
+}
+async function evHall(h, fly) {
+  SEL = null; pinsSel.style.display = "none";
+  const halls = EV.meta.halls || [], i = halls.indexOf(h);
+  infoEl.innerHTML = evHeader(`<h2 class="evh" style="--cc:${h.color || "#f0b429"}"><b>${i + 1}</b>${esc(h.name || "Salon")}</h2>`) +
+    (h.desc ? `<p class="evdesc">${esc(h.desc)}</p>` : "") + planHTML(h) + `<div class="evdoc">Yükleniyor…</div>
+    <div class="acts"><button id="ev-back">Salonlar</button>${halls.length > 1 ? '<button id="ev-next">Sonraki salon</button>' : ""}<button id="i-close">Kapat</button></div>`;
+  infoEl.hidden = false;
+  $("i-close").onclick = closeInfo; $("ev-back").onclick = evList;
+  if ($("ev-next")) $("ev-next").onclick = () => evHall(halls[(i + 1) % halls.length], true);
+  infoEl.querySelectorAll(".mk.o").forEach((m) => m.onclick = () => evHall(halls[+m.dataset.h]));
+  if (fly && h.x != null) { const p = hallPx(h); flyTo(p[0], p[1], Math.max(cam.z, 0.9 * dpr)); }
+  infoEl.querySelector(".evdoc").innerHTML = (await evDoc(h.program)) || "<p>Bu salon için program eklenmemiş.</p>";
+}
+async function loadEvent(slug) {
+  try {
+    const r = await fetch(EV_DIR + encodeURIComponent(slug) + "/event.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error(r.status);
+    const meta = await r.json(); if (!alive) return;
+    if (meta.city && meta.city !== city) { toast("Bu etkinlik başka bir haritada"); return; }
+    evClear(); EV = { meta, base: EV_DIR + encodeURIComponent(slug) + "/" }; EVENT_SLUG = slug;
+    await featReady; if (!alive) return;
+    evMount(); placeHash(null); if (innerWidth > 560) evList();
+  } catch (e) { toast("Etkinlik bulunamadı"); EVENT_SLUG = null; }
+}
+// upcoming events of this city, as a chip in the panel
+(async () => {
+  try {
+    const r = await fetch(EV_DIR + "index.json", { cache: "no-cache" }); if (!r.ok) return;
+    const list = (await r.json()).filter((e) => (!e.city || e.city === city) && (!e.end || e.end >= today()));
+    if (!alive || !list.length) return;
+    list.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+    const box = $("evlist"); box.hidden = false;
+    box.innerHTML = list.slice(0, 3).map((e) => `<button data-s="${esc(e.slug)}"><span class="evl-d">${esc(fmtRange(e.start, e.end))}</span>${esc(e.title)}</button>`).join("");
+    box.querySelectorAll("button").forEach((b) => b.onclick = () => loadEvent(b.dataset.s));
+  } catch (e) {}
+})();
+
+// ---- editor (edit mode): build an event, preview it live, export as a zip
+async function evDraftLoad() {
+  const d = await idb.get(DRAFT_KEY()).catch(() => null);
+  const meta = (d && d.meta) || { slug: "", title: "", city, start: today(), end: today(), desc: "", venue: null, venueName: "", program: "", plans: [], halls: [] };
+  return { meta, files: new Map((d && d.files) || []), urls: {}, draft: true };
+}
+async function evDraftSave() {
+  if (!EV || !EV.draft) return;
+  const meta = JSON.parse(JSON.stringify(EV.meta, (k, v) => (k === "_el" ? undefined : v)));
+  await idb.set(DRAFT_KEY(), { meta, files: [...EV.files] }).catch((e) => toast("Taslak kaydedilemedi: " + e.message));
+}
+function evAddFile(file) {
+  const ext = (file.name.match(/\.[a-z0-9]+$/i) || [".bin"])[0].toLowerCase();
+  let base = slugify(file.name.replace(/\.[^.]+$/, "")), name = base + ext, n = 2;
+  while (EV.files.has(name)) name = `${base}-${n++}${ext}`;
+  EV.files.set(name, file); return name;
+}
+const pickFile = (accept) => new Promise((res) => {
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = accept;
+  inp.onchange = () => res(inp.files[0] || null); inp.click();
+});
+async function evEditor() {
+  if (!EV || !EV.draft) { evClear(); EV = await evDraftLoad(); }
+  EVENT_DRAFT = true; evMount(false);
+  const m = EV.meta;
+  const fileRow = (label, key, accept) => `<div class="fld">${label}<span class="frow"><span class="fname">${m[key] ? esc(m[key]) : "<i>yok</i>"}</span><button data-file="${key}" data-acc="${accept}">${m[key] ? "Değiştir" : "Dosya seç"}</button>${m[key] ? `<button data-clear="${key}" class="ghost">Kaldır</button>` : ""}</span></div>`;
+  infoEl.innerHTML = `<h2>Etkinlik hazırla</h2><p class="sub">Taslak bu tarayıcıda saklanır. Bitince <b>Paketi indir</b>, zip'i sitenin köküne aç.</p>
+    <label class="fld">Etkinlik adı<input id="ev-title" value="${esc(m.title)}" placeholder="örn. ODTÜ Bilişim Günleri"></label>
+    <label class="fld">Bağlantı adı<input id="ev-slug" value="${esc(m.slug)}" placeholder="otomatik"></label>
+    <div class="frow2"><label class="fld">Başlangıç<input id="ev-start" type="date" value="${esc(m.start || "")}"></label><label class="fld">Bitiş<input id="ev-end" type="date" value="${esc(m.end || "")}"></label></div>
+    <label class="fld">Kısa açıklama<textarea id="ev-desc" rows="2">${esc(m.desc || "")}</textarea></label>
+    <div class="fld">Mekân<span class="frow"><span class="fname">${m.venue ? esc(m.venueName || m.venue) : "<i>seçilmedi</i>"}</span><button id="ev-venue">Haritadan seç</button></span></div>
+    ${fileRow("Genel program (.md, .png, .jpg, .pdf)", "program", ".md,.markdown,.txt,.png,.jpg,.jpeg,.webp,.pdf")}
+    <div class="fld">Kat planları<div class="elist">${(m.plans || []).map((p, i) => `<span class="erow"><span>${esc(p.name)}</span><button data-pdel="${i}" class="ghost">Sil</button></span>`).join("") || "<i>yok</i>"}</div><button id="ev-addplan">+ Kat planı ekle (görsel)</button></div>
+    <div class="fld">Salonlar<div class="elist">${(m.halls || []).map((h, i) => `<span class="erow" style="--cc:${h.color}"><span><b>${i + 1}</b> ${esc(h.name || "Salon")}${h.x == null ? " <small>· haritada yok</small>" : ""}</span><span><button data-hed="${i}">Düzenle</button><button data-hdel="${i}" class="ghost">Sil</button></span></span>`).join("") || "<i>yok</i>"}</div><button id="ev-addhall">+ Salon ekle</button></div>
+    <div class="acts"><button id="ev-imp" class="ghost">Paket yükle</button><button id="ev-reset" class="ghost">Taslağı sil</button><button class="primary" id="ev-exp">Paketi indir</button></div>`;
+  infoEl.hidden = false;
+  const sync = () => {
+    m.title = $("ev-title").value.trim(); m.slug = slugify($("ev-slug").value.trim() || m.title);
+    m.start = $("ev-start").value; m.end = $("ev-end").value || m.start; m.desc = $("ev-desc").value.trim(); m.city = city;
+    evDraftSave(); evMount(false);
+  };
+  ["ev-title", "ev-slug", "ev-start", "ev-end", "ev-desc"].forEach((id) => { const el = $(id); el.onchange = sync; el.addEventListener("keydown", (e) => e.stopPropagation()); });
+  $("ev-title").oninput = () => { if (!$("ev-slug").dataset.touched) $("ev-slug").placeholder = slugify($("ev-title").value) || "otomatik"; };
+  $("ev-slug").oninput = () => { $("ev-slug").dataset.touched = "1"; };
+  $("ev-venue").onclick = () => { sync(); evPick({ kind: "venue" }); closeInfo(); toast("Haritada etkinlik binasına dokun"); };
+  infoEl.querySelectorAll("[data-file]").forEach((b) => b.onclick = async () => {
+    sync(); const f = await pickFile(b.dataset.acc); if (!f) return;
+    if (m[b.dataset.file]) EV.files.delete(m[b.dataset.file]);
+    m[b.dataset.file] = evAddFile(f); await evDraftSave(); evEditor();
+  });
+  infoEl.querySelectorAll("[data-clear]").forEach((b) => b.onclick = async () => { EV.files.delete(m[b.dataset.clear]); m[b.dataset.clear] = ""; await evDraftSave(); evEditor(); });
+  $("ev-addplan").onclick = async () => {
+    sync(); const f = await pickFile("image/*"); if (!f) return;
+    const name = (f.name.replace(/\.[^.]+$/, "") || "Kat planı").slice(0, 40);
+    m.plans.push({ id: "p" + Date.now().toString(36), name, img: evAddFile(f) }); await evDraftSave(); evEditor();
+  };
+  infoEl.querySelectorAll("[data-pdel]").forEach((b) => b.onclick = async () => {
+    const p = m.plans.splice(+b.dataset.pdel, 1)[0]; EV.files.delete(p.img);
+    m.halls.forEach((h) => { if (h.plan === p.id) { h.plan = null; h.px = h.py = null; } }); await evDraftSave(); evEditor();
+  });
+  const COLORS = ["#f0b429", "#4f8cff", "#e5484d", "#2ec27e", "#b678ff", "#ff9f43", "#5ec8e5", "#ff5d73"];
+  $("ev-addhall").onclick = () => { sync(); const h = { id: "h" + Date.now().toString(36), name: `Salon ${m.halls.length + 1}`, color: COLORS[m.halls.length % COLORS.length], desc: "", program: "", plan: m.plans[0] ? m.plans[0].id : null, px: null, py: null, x: null, y: null, z: 0 };
+    m.halls.push(h); evDraftSave(); evHallEditor(h); };
+  infoEl.querySelectorAll("[data-hed]").forEach((b) => b.onclick = () => { sync(); evHallEditor(m.halls[+b.dataset.hed]); });
+  infoEl.querySelectorAll("[data-hdel]").forEach((b) => b.onclick = async () => { const h = m.halls.splice(+b.dataset.hdel, 1)[0]; if (h.program) EV.files.delete(h.program); await evDraftSave(); evEditor(); });
+  $("ev-exp").onclick = () => { sync(); evExport(); };
+  $("ev-imp").onclick = evImport;
+  $("ev-reset").onclick = async () => { if (!confirmEv) { confirmEv = true; $("ev-reset").textContent = "Emin misin?"; return; } confirmEv = false; await idb.del(DRAFT_KEY()).catch(() => {}); evClear(); EVENT_DRAFT = false; closeInfo(); toast("Taslak silindi"); };
+}
+let confirmEv = false;
+function evHallEditor(h) {
+  const m = EV.meta, plan = m.plans.find((p) => p.id === h.plan);
+  infoEl.innerHTML = `<h2>Salon</h2>
+    <label class="fld">Ad<input id="eh-name" value="${esc(h.name || "")}"></label>
+    <div class="frow2"><label class="fld">Renk<input id="eh-color" type="color" value="${esc(h.color || "#f0b429")}"></label>
+      <div class="fld">Haritadaki yeri<span class="frow"><span class="fname">${h.x == null ? "<i>yok</i>" : "işaretli"}</span><button id="eh-map">Haritada işaretle</button></span></div></div>
+    <label class="fld">Kısa açıklama<input id="eh-desc" value="${esc(h.desc || "")}" placeholder="örn. 1. kat · 400 kişilik"></label>
+    <div class="fld">Program (.md, .png, .jpg, .pdf)<span class="frow"><span class="fname">${h.program ? esc(h.program) : "<i>yok</i>"}</span><button id="eh-prog">${h.program ? "Değiştir" : "Dosya seç"}</button></span></div>
+    ${m.plans.length ? `<label class="fld">Kat planı<select id="eh-plan"><option value="">(yok)</option>${m.plans.map((p) => `<option value="${p.id}"${p.id === h.plan ? " selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>
+      ${plan ? `<div class="evplan edit"><span class="evplan-n">Plan üzerinde salonun yerine tıkla</span><div class="evplan-i" id="eh-planimg"><img src="${evURL(plan.img)}" alt="">${h.px != null ? `<i class="mk" style="left:${h.px * 100}%;top:${h.py * 100}%;--cc:${h.color}"></i>` : ""}</div></div>` : ""}` : `<p class="sub">Kat planı eklersen salonu plan üzerinde de işaretleyebilirsin.</p>`}
+    <div class="acts"><button id="eh-back" class="primary">Tamam</button></div>`;
+  infoEl.hidden = false;
+  const sync = () => { h.name = $("eh-name").value.trim() || "Salon"; h.color = $("eh-color").value; h.desc = $("eh-desc").value.trim();
+    if ($("eh-plan")) { const v = $("eh-plan").value || null; if (v !== h.plan) { h.plan = v; h.px = h.py = null; } } evDraftSave(); evMount(false); };
+  ["eh-name", "eh-desc"].forEach((id) => $(id).addEventListener("keydown", (e) => e.stopPropagation()));
+  ["eh-name", "eh-color", "eh-desc"].forEach((id) => $(id).onchange = sync);
+  if ($("eh-plan")) $("eh-plan").onchange = () => { sync(); evHallEditor(h); };
+  $("eh-map").onclick = () => { sync(); evPick({ kind: "hall", h }); closeInfo(); toast(`Haritada "${h.name}" için yere dokun`); };
+  $("eh-prog").onclick = async () => { sync(); const f = await pickFile(".md,.markdown,.txt,.png,.jpg,.jpeg,.webp,.pdf"); if (!f) return;
+    if (h.program) EV.files.delete(h.program); h.program = evAddFile(f); await evDraftSave(); evHallEditor(h); };
+  const pi = $("eh-planimg");
+  if (pi) pi.onclick = (e) => { const r = pi.getBoundingClientRect(); h.px = Math.round((e.clientX - r.left) / r.width * 1000) / 1000; h.py = Math.round((e.clientY - r.top) / r.height * 1000) / 1000; sync(); evHallEditor(h); };
+  $("eh-back").onclick = () => { sync(); evEditor(); };
+}
+function evPick(p) { EVPICK = p; document.body.classList.toggle("picking", !!p); }
+function evPickAt(x, y) {
+  const pick = EVPICK; evPick(null);
+  const ix = Math.floor(x / 4), iy = Math.floor(y / 4);
+  let b = null;
+  if (ix >= 0 && iy >= 0 && ix < IDW && iy < IDH) { const k = (iy * IDW + ix) * 4; b = FEAT.byI.get(IDS[k] * 256 + IDS[k + 1]) || null; }
+  if (pick.kind === "venue") {
+    if (!b) { toast("Bir binaya dokunmalısın"); evPick(pick); return; }
+    EV.meta.venue = b.id; EV.meta.venueName = b.name; evDraftSave(); evEditor(); return;
+  }
+  const z = b ? b.z : 0, [wx, wy] = pxToWorld(x, y + z * cosE / res);
+  Object.assign(pick.h, { x: Math.round(wx * 10) / 10, y: Math.round(wy * 10) / 10, z: Math.round(z * 10) / 10 });
+  evDraftSave(); evMount(false); evHallEditor(pick.h);
+}
+// zip (store only) — small writer and a reader that also inflates
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = (u) => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+function zipBlob(entries) {
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  const d = new Date(), dt = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate(), tm = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  for (const { name, data } of entries) {
+    const nm = enc.encode(name), crc = crc32(data), h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+    h.setUint16(10, tm, true); h.setUint16(12, dt, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true);
+    h.setUint16(26, nm.length, true); h.setUint16(28, 0, true);
+    parts.push(h.buffer, nm, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true);
+    c.setUint16(12, tm, true); c.setUint16(14, dt, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true);
+    c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+    cen.push(c.buffer, nm); off += 30 + nm.length + data.length;
+  }
+  const cs = cen.reduce((s, p) => s + p.byteLength, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, entries.length, true); e.setUint16(10, entries.length, true); e.setUint32(12, cs, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, e.buffer], { type: "application/zip" });
+}
+async function unzip(buf) {
+  const v = new DataView(buf), u = new Uint8Array(buf), out = new Map(), dec = new TextDecoder();
+  let e = -1; for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 66000); i--) if (v.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error("zip değil");
+  let p = v.getUint32(e + 16, true); const n = v.getUint16(e + 10, true);
+  for (let k = 0; k < n; k++) {
+    const meth = v.getUint16(p + 10, true), cs = v.getUint32(p + 20, true), nl = v.getUint16(p + 28, true), xl = v.getUint16(p + 30, true), cl = v.getUint16(p + 32, true), lo = v.getUint32(p + 42, true);
+    const name = dec.decode(u.subarray(p + 46, p + 46 + nl)); p += 46 + nl + xl + cl;
+    if (name.endsWith("/")) continue;
+    const ds = lo + 30 + v.getUint16(lo + 26, true) + v.getUint16(lo + 28, true), raw = u.slice(ds, ds + cs);
+    let data = raw;
+    if (meth === 8) data = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());
+    else if (meth !== 0) continue;
+    out.set(name, data);
+  }
+  return out;
+}
+const MIME = { md: "text/markdown", markdown: "text/markdown", txt: "text/plain", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", svg: "image/svg+xml", pdf: "application/pdf", json: "application/json" };
+async function evExport() {
+  const m = EV.meta;
+  if (!m.title) { toast("Önce etkinliğe bir ad ver"); return; }
+  if (!m.halls.length) { toast("En az bir salon ekle"); return; }
+  m.slug = m.slug || slugify(m.title);
+  const dir = `${EV_DIR}${m.slug}/`, enc = new TextEncoder();
+  const meta = JSON.parse(JSON.stringify(m, (k, v) => (k === "_el" ? undefined : v)));
+  const entries = [{ name: dir + "event.json", data: enc.encode(JSON.stringify(meta, null, 2)) }];
+  const used = new Set([m.program, ...m.plans.map((p) => p.img), ...m.halls.map((h) => h.program)].filter(Boolean));
+  for (const [name, blob] of EV.files) if (used.has(name)) entries.push({ name: dir + name, data: new Uint8Array(await blob.arrayBuffer()) });
+  let list = [];
+  try { const r = await fetch(EV_DIR + "index.json", { cache: "no-cache" }); if (r.ok) list = await r.json(); } catch (e) {}
+  list = list.filter((e) => e.slug !== m.slug);
+  list.push({ slug: m.slug, title: m.title, city, start: m.start, end: m.end, venue: m.venueName || "" });
+  list.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+  entries.push({ name: EV_DIR + "index.json", data: enc.encode(JSON.stringify(list, null, 2)) });
+  const ok = await saveFile(`etkinlik-${m.slug}.zip`, zipBlob(entries));
+  if (ok) toast(`İndirildi: zip'i sitenin köküne aç, "etkinlik" klasörü oluşur`);
+}
+async function evImport() {
+  const f = await pickFile(".zip,application/zip"); if (!f) return;
+  try {
+    const files = await unzip(await f.arrayBuffer());
+    const key = [...files.keys()].find((k) => /(^|\/)event\.json$/.test(k)); if (!key) throw new Error("event.json yok");
+    const dir = key.slice(0, -"event.json".length), meta = JSON.parse(new TextDecoder().decode(files.get(key)));
+    const fm = new Map();
+    for (const [k, data] of files) if (k.startsWith(dir) && k !== key) { const n = k.slice(dir.length); fm.set(n, new Blob([data], { type: MIME[(n.split(".").pop() || "").toLowerCase()] || "" })); }
+    meta.city = city; evClear(); EV = { meta, files: fm, urls: {}, draft: true };
+    await evDraftSave(); evEditor(); toast("Paket yüklendi");
+  } catch (e) { toast("Paket okunamadı: " + e.message); }
+}
+if (EDIT && editBar) {
+  const b = document.createElement("button"); b.id = "e-event"; b.textContent = "Etkinlik";
+  editBar.insertBefore(b, $("e-export")); b.onclick = () => evEditor();
+}
+if (EVENT_SLUG) featReady.then(() => { if (alive) loadEvent(EVENT_SLUG); });
+else if (EDIT) featReady.then(async () => {            // editors see their draft again after a reload
+  if (!alive || EV) return;
+  const d = await evDraftLoad(); if (!alive || EV) return;
+  if (d.meta.halls.length || d.meta.title) { EV = d; EVENT_DRAFT = true; evMount(false); }
+});
 
 onTap = (x, y) => {
   if (GM.mode === "where") { if (GM.phase === "guess") { GM.guess = [x, y]; pin("guess", x, y); $("g-go").disabled = false; } return; }
@@ -1813,7 +2305,7 @@ function frame(now) {
   gl.uniform1f(postP.u.uMaxR, 7 * dpr);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-  placeLabels(); gameFrame(); infoFrame();
+  placeLabels(); gameFrame(); eventFrame(); infoFrame();
   if (capHook) capHook(now);
   if (++uiTick % 10 === 0) scaleBar();
   requestAnimationFrame(frame);
