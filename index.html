@@ -77,7 +77,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .zoom button[aria-expanded="true"] { color: var(--accent); }
 .shotwin { position: fixed; right: 16px; top: 140px; width: 280px; z-index: 7; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
   padding: 12px 14px 12px; display: flex; flex-direction: column; gap: 12px; color: var(--text); box-shadow: 0 10px 28px rgba(0,0,0,.35);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 12.5px; }
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 12.5px; box-sizing: border-box; }
 .shotwin[hidden] { display: none; }
 .shotwin header { display: flex; align-items: center; justify-content: space-between; }
 .shotwin h3 { margin: 0; font: 600 14px var(--font-body); }
@@ -112,7 +112,18 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .game.info .links { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
 .game { position: fixed; right: 16px; top: 140px; width: min(340px, calc(100vw - 32px)); background: var(--panel);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 10px;
-  padding: 14px; display: grid; gap: 10px; box-sizing: border-box; z-index: 5; }
+  padding: 14px; display: flex; flex-direction: column; box-sizing: border-box; z-index: 5; max-height: calc(100vh - 156px); }
+.sheet-b { display: grid; gap: 10px; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.sheet-b > h2:first-child, .sheet-b > .evkick:first-child { padding-right: 56px; }
+.sheet-h { position: absolute; top: 9px; right: 9px; display: flex; align-items: center; gap: 2px; z-index: 1; }
+.sheet-h .grab, .sheet-h .sheet-t { display: none; }
+.sheet-h button { width: 26px; height: 26px; border: 0; border-radius: 6px; background: rgba(255,255,255,.06); color: var(--muted); font-size: 15px; line-height: 1; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.sheet-h button:hover { color: var(--text); background: rgba(255,255,255,.12); }
+.game.min { padding-top: 10px; padding-bottom: 10px; }
+.game.min .sheet-b { display: none; }
+.game.min .sheet-h { position: static; cursor: pointer; }
+.game.min .sheet-t { display: block; flex: 1; min-width: 0; font: 700 14px var(--font-body); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 6px; }
+.p-grab { display: none; }
 .game[hidden] { display: none; }
 .game h2 { margin: 0; font-size: 15px; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .game h2 small { font: 500 11.5px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -178,7 +189,6 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .game.info dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
 .game.info a { color: var(--accent); }
 .game.info .est { color: var(--muted); font-size: 11px; }
-.game.info { max-height: calc(100vh - 160px); overflow-y: auto; }
 .game.info .acts { align-items: center; justify-content: space-between; }
 .game.info .acts a { font-size: 12px; }
 .game.info .chip-c { margin: 0; font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 6px; }
@@ -199,8 +209,7 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 .editbar button { font: 600 12px var(--font-body); color: #1d1a10; background: var(--accent); border: 0; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
 .editbar #e-clear, .editbar #e-exit { background: transparent; color: #f4e7c0; border: 1px solid #8a6d1d; }
 @media (max-width: 560px) { .editbar { top: 8px; left: 10px; right: 10px; transform: none; gap: 5px; padding: 6px 8px; flex-wrap: nowrap; overflow-x: auto; }
-  .editbar .eb-hint, .editbar #e-count { display: none; } .editbar button { padding: 5px 8px; white-space: nowrap; font-size: 11.5px; }
-  .editing .game.info { top: 56px; max-height: 38vh; } }
+  .editbar .eb-hint, .editbar #e-count { display: none; } .editbar button { padding: 5px 8px; white-space: nowrap; font-size: 11.5px; } }
 .game.info .sub { margin: -4px 0 0; color: var(--muted); font-size: 11.5px; }
 .game.info .fld { display: flex; flex-direction: column; gap: 4px; font-size: 11.5px; color: var(--muted); }
 .game.info .fld input, .game.info .fld select, .game.info .fld textarea { font: 500 13px var(--font-body); color: var(--text); background: rgba(255,255,255,.06);
@@ -289,19 +298,44 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
   .evbar { top: 10px; left: 10px; right: 62px; transform: none; max-width: none; padding-left: 10px; }
   .editing .evbar { top: 56px; }
   .evbar #evb-prog { display: none; }
-  .has-ev .game.info { top: 72px; }
-  .has-ev .panel { display: none; }
+
 }
 .toast { position: fixed; left: 50%; top: 22px; transform: translateX(-50%); background: var(--accent); color: #1b1f24; font: 700 13px var(--font-body);
   padding: 8px 14px; border-radius: 999px; z-index: 6; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; transition: opacity .4s; }
-@media (max-width: 560px) { .game { top: 56px; right: 10px; width: calc(100vw - 20px); } .game.info { top: 10px; max-height: 34vh; overflow-y: auto; gap: 8px; } }
 @media (max-width: 560px) {
-  .panel { top: auto; bottom: 30px; left: 10px; width: calc(100vw - 20px); padding: 12px; gap: 10px; }
+  /* cards become bottom sheets */
+  .game, .shotwin { top: auto !important; bottom: 0; left: 0; right: 0 !important; width: 100% !important; max-height: 64vh; border-radius: 14px 14px 0 0;
+    border-bottom: 0; padding: 0 14px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 28px rgba(0,0,0,.35); }
+  .game .sheet-h { position: sticky; top: 0; padding: 14px 0 8px; margin: 0; cursor: pointer; background: transparent; }
+  .game .sheet-h .grab { display: block; position: absolute; left: 50%; top: 5px; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: var(--line); }
+  .game .sheet-h .sheet-t { display: block; flex: 1; min-width: 0; }
+  .game:not(.min) .sheet-h .sheet-t { visibility: hidden; }
+  .game .sheet-h button { width: 32px; height: 32px; font-size: 17px; }
+  .sheet-b > h2:first-child, .sheet-b > .evkick:first-child { padding-right: 0; }
+  .game:not(.min) { padding-top: 0; }
+  .game:not(.min) .sheet-h { position: absolute; top: 0; left: 14px; right: 14px; justify-content: flex-end; padding-top: 10px; }
+  .game:not(.min) .sheet-b { padding-top: 22px; }
+  .game:not(.min) .sheet-b > h2:first-child, .game:not(.min) .sheet-b > .evkick:first-child { padding-right: 76px; }
+  .game.min { padding-top: 0; padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+  .game .acts { position: sticky; bottom: 0; background: var(--panel); padding: 8px 0 2px; }
+  .sheet-open .panel { display: none; }
+  .shotwin header { padding-top: 10px; }
+}
+@media (max-width: 560px) {
+  .panel { top: auto; bottom: 0; left: 0; right: 0; width: 100%; padding: 0 12px calc(12px + env(safe-area-inset-bottom)); gap: 10px; border-radius: 14px 14px 0 0;
+    border-bottom: 0; max-height: 72vh; overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 -8px 28px rgba(0,0,0,.35); }
+  .p-grab { display: flex; flex-direction: column; align-items: center; gap: 3px; position: sticky; top: 0; z-index: 2; margin: 0 -12px; padding: 7px 0 4px;
+    background: transparent; border: 0; color: var(--muted); font: 500 10.5px var(--font-mono); cursor: pointer; }
+  .p-grab span { width: 38px; height: 4px; border-radius: 2px; background: var(--line); }
+  .p-grab em { font-style: normal; }
+  .panel.collapsed > :not(.p-grab):not(.cityseg):not(.search):not(.evlist-p) { display: none !important; }
+  .attr { right: auto; left: 10px; bottom: auto; top: 12px; font-size: 10px; max-width: calc(100vw - 80px); }
+  .has-ev .attr, .editing .attr { display: none; }
+  .search ul { top: auto; bottom: calc(100% + 4px); max-height: 46vh; }
   .panel .note, .panel .sub { display: none; }
   .zoom { top: 10px; right: 10px; }
   .shotwin { top: 116px; right: 10px; width: min(280px, calc(100vw - 20px)); }
   .gaming .panel { display: none; }
-  .gaming .game { top: auto; bottom: 10px; }
   .gaming .game canvas { max-height: 24vh; width: auto; max-width: 100%; justify-self: center; }
 }
 </style>
@@ -310,11 +344,12 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 <div id="labels"></div>
 <div id="pins"><svg aria-hidden="true"><line id="gline" stroke="#fff" stroke-width="2.5" stroke-dasharray="6 5" x1="0" y1="0" x2="0" y2="0" visibility="hidden"/></svg></div>
 <div id="crosshair" hidden></div>
-<section class="game" id="game" hidden aria-live="polite"></section>
-<section class="game info" id="info" hidden aria-live="polite"></section>
+<section class="game sheet" id="game" hidden><div class="sheet-h"><span class="grab" aria-hidden="true"></span><span class="sheet-t"></span><button class="sheet-min" aria-label="Küçült" title="Küçült">▾</button><button class="sheet-x" aria-label="Kapat" title="Kapat">×</button></div><div class="sheet-b" id="game-b" aria-live="polite"></div></section>
+<section class="game info sheet" id="info" hidden><div class="sheet-h"><span class="grab" aria-hidden="true"></span><span class="sheet-t"></span><button class="sheet-min" aria-label="Küçült" title="Küçült">▾</button><button class="sheet-x" aria-label="Kapat" title="Kapat">×</button></div><div class="sheet-b" id="info-b" aria-live="polite"></div></section>
 
 <section class="panel" aria-label="Harita kontrolleri">
-  <div class="seg three" role="group" aria-label="Harita">
+  <button class="p-grab" id="p-grab" aria-expanded="true" aria-controls="panel-more"><span aria-hidden="true"></span><em>Daha az</em></button>
+  <div class="seg three cityseg" role="group" aria-label="Harita">
     <button data-city="kizilay" aria-pressed="false" title="Ankara · Kızılay">Kızılay</button>
     <button data-city="odtu" aria-pressed="false" title="Ankara · ODTÜ kampüsü">ODTÜ</button>
     <button data-city="istanbul" aria-pressed="false" title="İstanbul · Eminönü, Galata, Taksim, Sultanahmet">İstanbul</button>
@@ -389,6 +424,23 @@ html, body { height: 100%; margin: 0; background: var(--ink); color: var(--text)
 let CITIES = null;
 let GAME_MODE = null;      // survives view switches (explore mode)
 let EVENT_SLUG = null, EVENT_DRAFT = false;   // active event survives view switches too
+// phones: the panel is a bottom sheet that folds to city tabs + search; an open card hides it
+const panelEl = document.querySelector(".panel");
+function setPanelOpen(open) {
+  panelEl.classList.toggle("collapsed", !open);
+  const g = document.getElementById("p-grab"); g.setAttribute("aria-expanded", String(open)); g.querySelector("em").textContent = open ? "Daha az" : "Daha fazla";
+}
+document.getElementById("p-grab").addEventListener("click", () => setPanelOpen(panelEl.classList.contains("collapsed")));
+if (innerWidth <= 560) setPanelOpen(false);
+{
+  const sync = () => document.body.classList.toggle("sheet-open", ["info", "game", "shotwin"].some((id) => !document.getElementById(id).hidden));
+  const mo = new MutationObserver((recs) => {
+    for (const r of recs) if (r.type === "childList") r.target.parentElement.classList.remove("min");
+    sync();
+  });
+  for (const id of ["info", "game", "shotwin"]) mo.observe(document.getElementById(id), { attributes: true, attributeFilter: ["hidden"] });
+  for (const id of ["info-b", "game-b"]) mo.observe(document.getElementById(id), { childList: true });
+}
 let current = null;
 const DIRS = { 0: "Kuzeye", 45: "Kuzeydoğuya", 90: "Doğuya", 135: "Güneydoğuya", 180: "Güneye", 225: "Güneybatıya", 270: "Batıya", 315: "Kuzeybatıya" };
 const hashParams = () => new URLSearchParams(location.hash.slice(1).split("&").slice(1).join("&"));
@@ -966,7 +1018,7 @@ function buildCars() {
 }
 
 // ------------------------------------------------------------ games
-const gameEl = $("game"), pinsEl = $("pins"), gline = $("gline"), cross = $("crosshair");
+const gameEl = $("game"), gameBody = $("game-b"), pinsEl = $("pins"), gline = $("gline"), cross = $("crosshair");
 const GM = { mode: null };
 const isPOI = (l) => l.k === "poi" || l.k === "minor" || l.k === "square";
 const POIS = labels.filter(isPOI);
@@ -999,13 +1051,13 @@ function setGameButtons() {
   dailyButton();
 }
 function stopGames(byUser) {
-  GM.mode = null; GM.daily = null; labelFilter = null; gameEl.hidden = true; gameEl.innerHTML = ""; cross.hidden = true; clearPins();
+  GM.mode = null; GM.daily = null; labelFilter = null; gameEl.hidden = true; gameBody.innerHTML = ""; cross.hidden = true; clearPins();
   lockNav(false); setGameButtons();
   if (byUser) GAME_MODE = null;
 }
-gameStop = () => { GM.mode = null; gameEl.hidden = true; gameEl.innerHTML = ""; cross.hidden = true; clearPins();
+gameStop = () => { GM.mode = null; gameEl.hidden = true; gameBody.innerHTML = ""; cross.hidden = true; clearPins();
   document.querySelectorAll("#v-left, #v-right, [data-city]").forEach((b) => { b.disabled = false; }); };
-function card(html) { gameEl.innerHTML = html; gameEl.hidden = false; }
+function card(html) { gameBody.innerHTML = html; gameEl.hidden = false; }
 function flyTo(x, y, z) { GM.fly = { x, y, z, t: 0, x0: cam.x, y0: cam.y, z0: cam.z }; }
 
 // ---- "Burası neresi?" : a crop of the map, the player taps where it is
@@ -1172,7 +1224,7 @@ async function shareText(text, copied, url) {
   const full = url ? `${text}\n${url}` : text;
   try { await navigator.clipboard.writeText(full); toast(copied); return; } catch (e) {}
   const ta = document.createElement("textarea"); ta.value = full; ta.className = "copybox"; ta.rows = 4; ta.readOnly = true;
-  gameEl.appendChild(ta); ta.select(); toast("Metni seçip kopyala");
+  gameBody.appendChild(ta); ta.select(); toast("Metni seçip kopyala");
 }
 
 // ---- "Keşif" : bring the ring over a landmark and zoom in to discover it
@@ -1231,7 +1283,29 @@ function gameFrame() {
   }
 }
 // ------------------------------------------------------------ places: click info, search, categories
-const infoEl = $("info"), qEl = $("q"), qRes = $("qres"), catsEl = $("cats");
+const infoEl = $("info"), infoBody = $("info-b"), qEl = $("q"), qRes = $("qres"), catsEl = $("cats");
+// cards are sheets: × closes, ▾ shrinks to a title bar (on phones the whole bar toggles)
+function toggleMin(el, force) {
+  const m = el.classList.toggle("min", force);
+  const h = el.querySelector(".sheet-b h2"); el.querySelector(".sheet-t").textContent = h ? h.childNodes[0] && h.childNodes[0].nodeType === 3 ? h.childNodes[0].textContent.trim() || h.textContent.trim() : h.textContent.trim() : "";
+  const b = el.querySelector(".sheet-min"); b.textContent = m ? "▴" : "▾"; b.setAttribute("aria-label", m ? "Büyüt" : "Küçült"); b.title = m ? "Büyüt" : "Küçült";
+}
+for (const [el, close] of [[gameEl, () => (GM.mode ? stopGames(true) : (gameEl.hidden = true))], [infoEl, () => closeInfo()]]) {
+  el.querySelector(".sheet-x").onclick = (e) => { e.stopPropagation(); close(); };
+  el.querySelector(".sheet-min").onclick = (e) => { e.stopPropagation(); toggleMin(el); };
+  el.querySelector(".sheet-h").onclick = () => { if (el.classList.contains("min") || innerWidth <= 560) toggleMin(el); };
+}
+// keep a place in the part of the screen the cards leave free
+function flyFree(px, py, z) {
+  let want = innerHeight / 2;
+  if (innerWidth <= 560) {
+    const bar = document.querySelector(".evbar, .editbar"), top = bar ? bar.getBoundingClientRect().bottom : 0;
+    const sheets = [infoEl, gameEl].filter((e) => !e.hidden).map((e) => e.getBoundingClientRect().top);
+    const bot = Math.max(top + 120, Math.min(innerHeight * 0.5, ...sheets.length ? sheets : [innerHeight - 140]));
+    want = (top + bot) / 2;
+  }
+  flyTo(px, py + (innerHeight / 2 - want) * dpr / z, z);
+}
 let FEAT = null, IDS = null, IDW = 0, IDH = 0, ITEMS = [], SEL = null;
 let featResolve; const featReady = new Promise((r) => { featResolve = r; });
 const viewTag = () => (vi === (CITIES[city].start || 0) ? city : `${city}-${CITIES[city].views[vi].h}`);
@@ -1432,7 +1506,7 @@ function openEditor(it, at) {
   SEL = it || { px: at.px, py: at.py }; pinsSel.style.display = "";
   const isNew = !it, t = (it && it.t) || {}, area = at && at.area;
   const orig = it && it.orig ? it.orig.t.name : t.name;
-  infoEl.innerHTML = `<h2>${isNew ? "Yeni yer" : "Düzenle"}</h2>
+  infoBody.innerHTML = `<h2>${isNew ? "Yeni yer" : "Düzenle"}</h2>
     <p class="sub">${isNew ? "Tıkladığın noktaya bir işaret ve ad eklenir." : `${it.user ? "Senin eklediğin yer" : `OSM ${esc(it.id)}`}${orig && orig !== t.name ? ` · haritadaki adı: ${esc(orig)}` : ""}`}</p>
     <label class="fld">Ad<input id="e-name" value="${esc(t.name || "")}" placeholder="${isNew ? "örn. 10. Yurt girişi" : esc(nameOf(it))}"></label>
     <label class="fld">Kategori<select id="e-cat">${catOptions(it ? it.c : (area ? area.c : "diger"))}</select></label>
@@ -1555,7 +1629,7 @@ function infoFrame() {
 const pinsSel = document.createElement("div"); pinsSel.className = "pin sel"; pinsSel.style.display = "none"; pinsEl.appendChild(pinsSel);
 const prevGameStop = gameStop;
 gameStop = () => { prevGameStop(); closeInfo(); if (editBar) editBar.remove(); evClear(); evBox.remove(); evTip.remove(); featLabels.forEach((el) => el.remove()); featLabels.clear(); catsEl.innerHTML = ""; catsEl.hidden = true; qEl.value = ""; qRes.hidden = true; };
-function closeInfo() { if (SEL && SEL.id) placeHash(null); SEL = null; pinsSel.style.display = "none"; infoEl.hidden = true; infoEl.innerHTML = ""; }
+function closeInfo() { if (SEL && SEL.id) placeHash(null); SEL = null; pinsSel.style.display = "none"; infoEl.hidden = true; infoBody.innerHTML = ""; }
 function groundM(a, b) { return Math.hypot((a.px - b.px) * res, (a.py - b.py) * res / sinE); }
 function openInfo(it, fly) {
   if (GM.mode) return;
@@ -1598,7 +1672,7 @@ function openInfo(it, fly) {
   const near = ITEMS.filter((o) => o !== it && o.named && o.name !== it.name && !inside.includes(o)).map((o) => [o, groundM(o, it)]).filter((o) => o[1] < 220)
     .sort((a, b) => a[1] - b[1]).slice(0, 4);
   const osm = /^[nwr]\d+$/.test(it.id) ? `https://www.openstreetmap.org/${({ n: "node", w: "way", r: "relation" })[it.id[0]]}/${it.id.slice(1)}` : null;
-  infoEl.innerHTML = `<h2>${esc(it.name)}</h2>
+  infoBody.innerHTML = `<h2>${esc(it.name)}</h2>
     <p class="chip-c" style="--cc:${cc}">${esc(cl)}${it.named ? "" : " · isimsiz"}${it.user ? " · elle eklendi" : it.edited ? " · düzenlendi" : ""}</p>
     <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
     ${inside.length ? `<div class="near in"><span>Bu binada</span>${inside.map((o, i) => `<button data-in="${i}" style="--cc:${catOf(o.c)[1]}">${esc(o.name)}</button>`).join("")}</div>` : ""}
@@ -1610,17 +1684,13 @@ function openInfo(it, fly) {
   if (EV && EV.meta.venue === it.id) {
     const d = document.createElement("div"); d.className = "evcta";
     d.innerHTML = `<span>Burada etkinlik var: <b>${esc(EV.meta.title || "")}</b></span><button>Salonlar ve program</button>`;
-    d.querySelector("button").onclick = evList; infoEl.insertBefore(d, infoEl.querySelector(".links"));
+    d.querySelector("button").onclick = evList; infoBody.insertBefore(d, infoBody.querySelector(".links"));
   }
   $("i-share").onclick = () => shareText(`${it.name} · İzometrik Şehirler`, "Bağlantı kopyalandı", placeURL(it));
   placeHash(it);
   infoEl.querySelectorAll(".near button[data-n]").forEach((b) => { b.onclick = () => openInfo(near[+b.dataset.n][0], true); });
   infoEl.querySelectorAll(".near button[data-in]").forEach((b) => { b.onclick = () => openInfo(inside[+b.dataset.in], false); });
-  if (fly) {                                   // keep the place in the strip the card and panel leave free
-    const z = Math.max(cam.z, 1.0 * dpr), top = infoEl.getBoundingClientRect().bottom, bot = document.querySelector(".panel").getBoundingClientRect().top;
-    const want = innerWidth <= 560 && bot > top + 40 ? (top + bot) / 2 : innerHeight / 2;
-    flyTo(it.px, it.py + (innerHeight / 2 - want) * dpr / z, z);
-  }
+  if (fly) flyFree(it.px, it.py, Math.max(cam.z, 1.0 * dpr));
 }
 function infoTap(x, y) {
   if (!FEAT) return;
@@ -1666,7 +1736,7 @@ function pickHit(it) {
   qRes.hidden = true; qEl.value = it.name; qEl.blur();
   if (GM.mode) stopGames(true);
   if (it.feat) return openInfo(it.feat, true);
-  if (it.lab) { flyTo(it.px, it.py, Math.max(cam.z, 0.9 * dpr)); closeInfo(); return; }
+  if (it.lab) { closeInfo(); flyFree(it.px, it.py, Math.max(cam.z, 0.9 * dpr)); return; }
   openInfo(it, true);
 }
 
@@ -1767,6 +1837,7 @@ function evMount(fly = true) {
   evBar.innerHTML = `<span class="evb-t"><b>${esc(m.title || "Etkinlik")}</b><small>${esc([fmtRange(m.start, m.end), m.venueName || (venue && venue.name)].filter(Boolean).join(" · "))}${EV.draft ? " · taslak" : ""}</small></span>
     <button id="evb-halls">Salonlar</button>${m.program ? '<button id="evb-prog">Program</button>' : ""}<button id="evb-x" aria-label="Etkinliği kapat">×</button>`;
   document.body.appendChild(evBar); document.body.classList.add("has-ev");
+  if (innerWidth <= 560) setPanelOpen(false);
   $("evb-halls").onclick = evList;
   if ($("evb-prog")) $("evb-prog").onclick = evProgram;
   $("evb-x").onclick = () => { EVENT_SLUG = null; closeInfo(); evClear(); placeHash(null); };
@@ -1815,7 +1886,7 @@ function evHeader(sub) {
 function evList() {
   SEL = null; pinsSel.style.display = "none";
   const m = EV.meta, halls = m.halls || [];
-  infoEl.innerHTML = evHeader(`<h2>Salonlar</h2>`) + (m.desc ? `<p class="evdesc">${esc(m.desc)}</p>` : "") +
+  infoBody.innerHTML = evHeader(`<h2>Salonlar</h2>`) + (m.desc ? `<p class="evdesc">${esc(m.desc)}</p>` : "") +
     `<div class="evlist">${halls.map((h, i) => `<button data-h="${i}" style="--cc:${h.color || "#f0b429"}"><b>${i + 1}</b><span>${esc(h.name || "Salon")}${h.desc ? `<small>${esc(h.desc)}</small>` : ""}</span></button>`).join("") || "<p>Henüz salon eklenmemiş.</p>"}</div>
     <div class="acts">${m.program ? '<button id="ev-prog">Genel program</button>' : ""}<button id="i-close">Kapat</button><button class="primary" id="ev-share">Paylaş</button></div>`;
   infoEl.hidden = false;
@@ -1829,7 +1900,7 @@ function evShare() {
 }
 async function evProgram() {
   SEL = null; pinsSel.style.display = "none";
-  infoEl.innerHTML = evHeader(`<h2>Genel program</h2>`) + `<div class="evdoc">Yükleniyor…</div><div class="acts"><button id="ev-back">Salonlar</button><button id="i-close">Kapat</button></div>`;
+  infoBody.innerHTML = evHeader(`<h2>Genel program</h2>`) + `<div class="evdoc">Yükleniyor…</div><div class="acts"><button id="ev-back">Salonlar</button><button id="i-close">Kapat</button></div>`;
   infoEl.hidden = false; $("i-close").onclick = closeInfo; $("ev-back").onclick = evList;
   infoEl.querySelector(".evdoc").innerHTML = (await evDoc(EV.meta.program)) || "<p>Program eklenmemiş.</p>";
 }
@@ -1843,14 +1914,14 @@ function planHTML(h) {
 async function evHall(h, fly) {
   SEL = null; pinsSel.style.display = "none";
   const halls = EV.meta.halls || [], i = halls.indexOf(h);
-  infoEl.innerHTML = evHeader(`<h2 class="evh" style="--cc:${h.color || "#f0b429"}"><b>${i + 1}</b>${esc(h.name || "Salon")}</h2>`) +
+  infoBody.innerHTML = evHeader(`<h2 class="evh" style="--cc:${h.color || "#f0b429"}"><b>${i + 1}</b>${esc(h.name || "Salon")}</h2>`) +
     (h.desc ? `<p class="evdesc">${esc(h.desc)}</p>` : "") + planHTML(h) + `<div class="evdoc">Yükleniyor…</div>
     <div class="acts"><button id="ev-back">Salonlar</button>${halls.length > 1 ? '<button id="ev-next">Sonraki salon</button>' : ""}<button id="i-close">Kapat</button></div>`;
   infoEl.hidden = false;
   $("i-close").onclick = closeInfo; $("ev-back").onclick = evList;
   if ($("ev-next")) $("ev-next").onclick = () => evHall(halls[(i + 1) % halls.length], true);
   infoEl.querySelectorAll(".mk.o").forEach((m) => m.onclick = () => evHall(halls[+m.dataset.h]));
-  if (fly && h.x != null) { const p = hallPx(h); flyTo(p[0], p[1], Math.max(cam.z, 0.9 * dpr)); }
+  if (fly && h.x != null) { const p = hallPx(h); flyFree(p[0], p[1], Math.max(cam.z, 0.9 * dpr)); }
   infoEl.querySelector(".evdoc").innerHTML = (await evDoc(h.program)) || "<p>Bu salon için program eklenmemiş.</p>";
 }
 async function loadEvent(slug) {
@@ -1903,7 +1974,7 @@ async function evEditor() {
   EVENT_DRAFT = true; evMount(false);
   const m = EV.meta;
   const fileRow = (label, key, accept) => `<div class="fld">${label}<span class="frow"><span class="fname">${m[key] ? esc(m[key]) : "<i>yok</i>"}</span><button data-file="${key}" data-acc="${accept}">${m[key] ? "Değiştir" : "Dosya seç"}</button>${m[key] ? `<button data-clear="${key}" class="ghost">Kaldır</button>` : ""}</span></div>`;
-  infoEl.innerHTML = `<h2>Etkinlik hazırla</h2><p class="sub">Taslak bu tarayıcıda saklanır. Bitince <b>Paketi indir</b>, zip'i sitenin köküne aç.</p>
+  infoBody.innerHTML = `<h2>Etkinlik hazırla</h2><p class="sub">Taslak bu tarayıcıda saklanır. Bitince <b>Paketi indir</b>, zip'i sitenin köküne aç.</p>
     <label class="fld">Etkinlik adı<input id="ev-title" value="${esc(m.title)}" placeholder="örn. ODTÜ Bilişim Günleri"></label>
     <label class="fld">Bağlantı adı<input id="ev-slug" value="${esc(m.slug)}" placeholder="otomatik"></label>
     <div class="frow2"><label class="fld">Başlangıç<input id="ev-start" type="date" value="${esc(m.start || "")}"></label><label class="fld">Bitiş<input id="ev-end" type="date" value="${esc(m.end || "")}"></label></div>
@@ -1950,7 +2021,7 @@ async function evEditor() {
 let confirmEv = false;
 function evHallEditor(h) {
   const m = EV.meta, plan = m.plans.find((p) => p.id === h.plan);
-  infoEl.innerHTML = `<h2>Salon</h2>
+  infoBody.innerHTML = `<h2>Salon</h2>
     <label class="fld">Ad<input id="eh-name" value="${esc(h.name || "")}"></label>
     <div class="frow2"><label class="fld">Renk<input id="eh-color" type="color" value="${esc(h.color || "#f0b429")}"></label>
       <div class="fld">Haritadaki yeri<span class="frow"><span class="fname">${h.x == null ? "<i>yok</i>" : "işaretli"}</span><button id="eh-map">Haritada işaretle</button></span></div></div>
@@ -2069,7 +2140,7 @@ else if (EDIT) featReady.then(async () => {            // editors see their draf
 });
 
 onTap = (x, y) => {
-  if (GM.mode === "where") { if (GM.phase === "guess") { GM.guess = [x, y]; pin("guess", x, y); $("g-go").disabled = false; } return; }
+  if (GM.mode === "where") { if (GM.phase === "guess") { GM.guess = [x, y]; pin("guess", x, y); $("g-go").disabled = false; toggleMin(gameEl, false); } return; }
   if (GM.mode === "explore") return;
   infoTap(x, y);
 };
